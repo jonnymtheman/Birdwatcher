@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Birdwatcher</string>
     <string name="take">Take!</string>
+    <string name="take_pic">Take picture</string>
+    <string name="my_birds">My birds</string>
+    <string name="my_tours">My tours</string>
 </resources>
