@@ -43,6 +43,15 @@ public class BirdBank {
     public ArrayList<Bird> getBirds() {
         return birds;
     }
+
+    public Bird getBird(int id) {
+        for (Bird bird : birds) {
+            if (bird.getmId() == id) {
+                return bird;
+            }
+        }
+        return null;
+    }
     /*
         private boolean saveCrimes() {
         try {

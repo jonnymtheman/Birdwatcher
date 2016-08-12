@@ -16,14 +16,17 @@ import java.util.UUID;
 @SuppressLint("NewApi")
 public class BirdFragment extends Fragment {
 
+    private Bird bird;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
 
-        int birdId = (UUID) getArguments().getSerializable(EXTRA_CRIME_ID);
+       // int birdId = (UUID) getArguments().getSerializable(EXTRA_CRIME_ID);
 
-        mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
+      //  bird = BirdBank.get(getActivity()).getBird(birdId);
+
     }
 
 

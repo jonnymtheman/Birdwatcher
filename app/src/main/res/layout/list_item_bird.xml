@@ -5,7 +5,9 @@
 <TextView
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:id="@+id/bird_list_bird"/>
+    android:id="@+id/bird_list_bird"
+    android:text="@string/ExempelBirdName"
+    android:textSize="40dp" />
 
 
 </LinearLayout>

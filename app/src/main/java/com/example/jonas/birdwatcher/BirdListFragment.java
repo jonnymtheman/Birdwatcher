@@ -14,6 +14,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 /**
+ *
  * File:       ${FILE_NAME}.java
  * Author:     Jonas Nyman
  * Assignment: Inlämningsuppgift 3 - Valfri Applikation
@@ -29,7 +30,8 @@ public class BirdListFragment extends ListFragment {
         super.onCreate(savedInstanceState);
         getActivity().setTitle("Your birds");
 
-        birds = new ArrayList<Bird>();
+        //birds = new ArrayList<Bird>();
+        birds = BirdBank.get(getActivity()).getBirds();
 
         /*
         for (int i = 0; i < 10; i++) {
@@ -46,17 +48,17 @@ public class BirdListFragment extends ListFragment {
         Bird bird = ((BirdAdapter)getListAdapter()).getItem(position);
         Log.d("InnanPos", "Position: "+position);
         Log.d("Innan", ""+bird.getName());
-        //Intent i = new Intent(getActivity(), CrimePagerActivity.class);
-        //i.putExtra(CrimeFragment.EXTRA_CRIME_ID, c.getId());
-        //startActivity(i);
+        Intent i = new Intent(getActivity(), BirdActivity.class);
+        i.putExtra("Hej", ""+bird.getmId());
+        startActivity(i);
     }
 
-    /*
+
     @Override
     public void onResume() {
         super.onResume();
-        ((CrimeAdapter)getListAdapter()).notifyDataSetChanged();
-    } */
+        ((BirdAdapter)getListAdapter()).notifyDataSetChanged();
+    }
 
 
     private class BirdAdapter extends ArrayAdapter<Bird> {
@@ -77,7 +79,7 @@ public class BirdListFragment extends ListFragment {
             if (bird == null) {
                 Log.d("TAG", "Bird var null");
             } else {
-                Log.d("TAG", ""+bird.getName());
+                //Log.d("TAG", ""+bird.getName());
             }
 
 

@@ -4,4 +4,7 @@
     <string name="take_pic">Take picture</string>
     <string name="my_birds">My birds</string>
     <string name="my_tours">My tours</string>
+    <string name="title_activity_bird">BirdActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="ExempelBirdName">ExempelBirdRubrik</string>
 </resources>
