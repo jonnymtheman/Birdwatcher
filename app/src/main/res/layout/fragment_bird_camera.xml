@@ -20,7 +20,7 @@
             android:text="@string/take"
             android:id="@+id/bird_camera_takePicture"/>
     </LinearLayout>
-    <FrameLayout android:id="@+id/crime_camera_progressContainer"
+    <FrameLayout android:id="@+id/bird_camera_progressContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="true">

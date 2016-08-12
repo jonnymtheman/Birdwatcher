@@ -47,9 +47,10 @@ public class BirdListFragment extends ListFragment {
 
         Bird bird = ((BirdAdapter)getListAdapter()).getItem(position);
         Log.d("InnanPos", "Position: "+position);
-        Log.d("Innan", ""+bird.getName());
+        Log.d("Innan", ""+bird.getName()+","+bird.getmId());
         Intent i = new Intent(getActivity(), BirdActivity.class);
         i.putExtra("Hej", ""+bird.getmId());
+        i.putExtra("Hej1", bird);
         startActivity(i);
     }
 
