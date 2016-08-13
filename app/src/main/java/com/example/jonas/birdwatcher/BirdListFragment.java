@@ -51,6 +51,7 @@ public class BirdListFragment extends ListFragment {
         Intent i = new Intent(getActivity(), BirdActivity.class);
         i.putExtra("Hej", ""+bird.getmId());
         i.putExtra("Hej1", bird);
+        i.putParcelableArrayListExtra("Hej2",bird.getPhotos());
         startActivity(i);
     }
 

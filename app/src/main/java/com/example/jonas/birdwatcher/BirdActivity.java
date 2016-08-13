@@ -2,12 +2,18 @@ package com.example.jonas.birdwatcher;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.support.v4.graphics.BitmapCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 /*
 TODO Gör så att man kan ta kort i action baren : Starta kamera activiteten
@@ -16,6 +22,7 @@ public class BirdActivity extends AppCompatActivity {
     private static final String TAG = "BirdActivity";
     private static final int REQUEST_PHOTO = 1;
     private TextView birdnameView;
+    private ImageView birdImage;
 
     private Bird bird;
 
@@ -28,6 +35,8 @@ public class BirdActivity extends AppCompatActivity {
         birdnameView = (TextView) findViewById(R.id.birdName);
         String name = getIntent().getStringExtra("Hej");
         bird = getIntent().getParcelableExtra("Hej1");
+        ArrayList<BirdPhoto> tmp = getIntent().getParcelableArrayListExtra("Hej2");
+        bird.setPhotos(tmp);
         Log.d(TAG, "Name: "+name);
         Log.d(TAG, "Bird: " +bird.getName()+","+bird.getmId());
         birdnameView.setText(name);
@@ -42,6 +51,36 @@ public class BirdActivity extends AppCompatActivity {
 
             }
         });
+
+        birdImage = (ImageView) findViewById(R.id.birdImageView);
+    }
+
+    private void showPhoto() {
+        BirdPhoto photo = bird.getPhotos().get(0);
+        BitmapDrawable b = null;
+        if (photo != null) {
+            String photoPath = getFileStreamPath(photo.getFileName()).getAbsolutePath();
+            b = PictureUtils.getScaledDrawable(this, photoPath);
+        }
+        birdImage.setImageDrawable(b);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        showPhoto();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (birdImage != null) {
+            BitmapDrawable b = (BitmapDrawable)birdImage.getDrawable();
+            if (b.getBitmap() != null) {
+                b.getBitmap().recycle();
+            }
+            birdImage.setImageDrawable(null);
+        }
     }
 
     @Override
@@ -54,10 +93,13 @@ public class BirdActivity extends AppCompatActivity {
                     .getStringExtra(BirdCameraFragment.EXTRA_PHOTO_FILENAME);
             if (filename != null) {
                 BirdPhoto photo = new BirdPhoto(filename);
-
+                ArrayList<BirdPhoto> photos = new ArrayList<BirdPhoto>();
+                photos.add(photo);
+                bird.setPhotos(photos);
+                BirdBank.get(this).updateBird(bird);
                 //Photo p = new Photo(filename);
                 //mCrime.setPhoto(p);
-                //showPhoto();
+                showPhoto();
                 Log.d(TAG, filename);
             }
         }

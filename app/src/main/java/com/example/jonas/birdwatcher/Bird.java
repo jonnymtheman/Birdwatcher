@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * Course:     Utveckling av mobila applikationer
  * Version:    1.0
  */
-public class Bird implements Parcelable{
+public class Bird implements Parcelable {
 
     private int mId;
 

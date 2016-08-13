@@ -29,7 +29,12 @@ public class BirdBank {
 
         for (int i = 0; i < 10; i++) {
             Bird bird = new Bird("Name"+i, i);
+            BirdPhoto photo = new BirdPhoto("Photo"+i);
+            ArrayList<BirdPhoto> photos = new ArrayList<BirdPhoto>();
+            photos.add(photo);
+            bird.setPhotos(photos);
             birds.add(bird);
+
         }
     }
 
@@ -42,6 +47,14 @@ public class BirdBank {
 
     public ArrayList<Bird> getBirds() {
         return birds;
+    }
+
+    public void updateBird(Bird bird) {
+        for (Bird b : birds) {
+            if (b.getmId() == bird.getmId()) {
+                b.setPhotos(bird.getPhotos());
+            }
+        }
     }
 
     public Bird getBird(int id) {
