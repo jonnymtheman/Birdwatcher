@@ -26,6 +26,9 @@ public class BirdCameraFragment extends Fragment {
     private static final String TAG = "BirdCameraFragment";
     public static final String EXTRA_PHOTO_FILENAME = "BirdCameraFragment.filename";
 
+    private String birdName;
+    private int birdID;
+    private int birdPhotoID;
     private Camera mCamera;
     private SurfaceView mSurfaceView;
     private View mProgressContainer;
@@ -40,7 +43,8 @@ public class BirdCameraFragment extends Fragment {
     private Camera.PictureCallback mJpegCallBack = new Camera.PictureCallback() {
         public void onPictureTaken(byte[] data, Camera camera) {
             // create a filename
-            String filename = UUID.randomUUID().toString() + ".jpg";
+            String filename = birdName + birdID + birdPhotoID +".jpg"; //UUID.randomUUID().toString() + ".jpg";
+            Log.d(TAG, "FileName: "+filename);
             // save the jpeg data to disk
             FileOutputStream os = null;
             boolean success = true;
@@ -59,7 +63,7 @@ public class BirdCameraFragment extends Fragment {
                     success = false;
                 }
             }
-
+            BirdBank.get(getActivity()).storeBirds(data, birdID);
             if (success) {
                 // set the photo filename on the result intent
                 if (success) {
@@ -69,7 +73,7 @@ public class BirdCameraFragment extends Fragment {
                     Log.d(TAG, "File:"+filename);
                 } else {
                     getActivity().setResult(Activity.RESULT_CANCELED);
-                    Log.d(TAG, "Faled: "+filename);
+                    Log.d(TAG, "Failed: "+filename);
                 }
             }
             getActivity().finish();
@@ -79,6 +83,13 @@ public class BirdCameraFragment extends Fragment {
     @SuppressWarnings("deprecation")
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_bird_camera, parent, false);
+
+        birdName = getActivity().getIntent().getStringExtra("BIRD_NAME");
+        birdID = getActivity().getIntent().getIntExtra("BIRD_ID",0);
+        birdPhotoID = getActivity().getIntent().getIntExtra("PHOTO_ID", 0);
+        Log.d(TAG, "Birdname: "+birdName);
+        Log.d(TAG, "BirdID: "+birdID);
+
 
         mProgressContainer = v.findViewById(R.id.bird_camera_progressContainer);
         mProgressContainer.setVisibility(View.INVISIBLE);

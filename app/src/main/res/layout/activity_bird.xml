@@ -29,4 +29,11 @@
         android:scaleType="centerInside"
         android:background="@android:color/darker_gray"
         android:cropToPadding="true"/>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/bird_photos_listView">
+
+    </ListView>
 </LinearLayout>

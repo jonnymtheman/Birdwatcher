@@ -47,6 +47,10 @@ public class Bird implements Parcelable {
         this.photos = photos;
     }
 
+    public void addPhoto(BirdPhoto photo) {
+        photos.add(photo);
+    }
+
     public ArrayList<BirdPhoto> getPhotos() {
 
         return photos;

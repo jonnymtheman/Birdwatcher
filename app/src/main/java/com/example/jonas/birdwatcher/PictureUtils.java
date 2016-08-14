@@ -8,8 +8,8 @@ import android.view.Display;
 import android.widget.ImageView;
 
 /**
- * File:       ${FILE_NAME}.java
- * Author:     Jonas Nyman
+ * File:       PictureUtils.java
+ * Author:     Boken
  * Assignment: Inlämningsuppgift 3 - Valfri Applikation
  * Course:     Utveckling av mobila applikationer
  * Version:    1.0
