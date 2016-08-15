@@ -3,7 +3,10 @@ package com.example.jonas.birdwatcher;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
+import android.os.Environment;
 import android.support.v4.graphics.BitmapCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +17,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 /*
@@ -62,20 +68,35 @@ public class BirdActivity extends AppCompatActivity {
             }
         });
 
+
+        ArrayList<BirdPhoto> photos1 = bird.getPhotos();
+        BirdPhoto photo = bird.getPhotos().get(1);
+        Log.d(TAG, "PhotoName:"+photo.getFileName());
+        File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).
+                getAbsolutePath(), photo.getFileName()); //"1464691368453.jpg");
+        String fstr = f.getAbsolutePath();
+        //Bitmap myBitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
         birdImage = (ImageView) findViewById(R.id.birdImageView);
+        birdImage.setImageURI(Uri.fromFile(f));
         photosList = (ListView) findViewById(R.id.bird_photos_listView);
 
 
     }
 
     private void showPhoto() {
-        BirdPhoto photo = bird.getPhotos().get(0);
-        BitmapDrawable b = null;
+
+        //File f = getAlbumStorageDir(this.appContext, "Birds");
+     /*   File file = new File(getExternalFilesDir(
+                Environment.DIRECTORY_PICTURES), "Birds");
+        Uri uri = Uri.fromFile(file);
+        birdImage.setImageURI(uri); */
+
+     /*   BitmapDrawable b = null;
         if (photo != null) {
             String photoPath = getFileStreamPath(photo.getFileName()).getAbsolutePath();
             b = PictureUtils.getScaledDrawable(this, photoPath);
-        }
-        birdImage.setImageDrawable(b);
+         } */
+        // birdImage.setImageDrawable(b);
     }
 
     @Override
@@ -87,13 +108,13 @@ public class BirdActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-        if (birdImage != null) {
+       /* if (birdImage != null) {
             BitmapDrawable b = (BitmapDrawable)birdImage.getDrawable();
             if (b.getBitmap() != null) {
                 b.getBitmap().recycle();
             }
-            birdImage.setImageDrawable(null);
-        }
+            birdImage.setImageDrawable(null); */
+        // }
     }
 
     @Override

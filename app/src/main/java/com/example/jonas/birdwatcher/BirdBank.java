@@ -1,6 +1,7 @@
 package com.example.jonas.birdwatcher;
 
 import android.content.Context;
+import android.media.MediaScannerConnection;
 import android.os.Environment;
 import android.util.Log;
 
@@ -9,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -36,7 +38,7 @@ public class BirdBank {
 
         birds = new ArrayList<Bird>();
 
-        for (int i = 0; i < 10; i++) {
+     /*   for (int i = 0; i < 10; i++) {
             Bird bird = new Bird("Name"+i, i);
             BirdPhoto photo = new BirdPhoto("Photo"+i+".jpg");
             ArrayList<BirdPhoto> photos = new ArrayList<BirdPhoto>();
@@ -44,7 +46,7 @@ public class BirdBank {
             bird.setPhotos(photos);
             birds.add(bird);
 
-        }
+        } */
     }
 
 
@@ -87,23 +89,41 @@ public class BirdBank {
         if (isExternalStorageWritable()) {
             Bird bird = getBird(birdId);
             Date date = new Date();
-            String str = date.toString();
-            String newFileName = "Photo" + bird.getName()+bird.getmId()
-                                        +bird.getPhotos().size()+str+".jpg";
+            SimpleDateFormat dateFormat =
+                    new SimpleDateFormat ("Eyyyy.MM.ddhh:mm:ss");
 
-            File f = getAlbumStorageDir(this.appContext, "Birds");
-            File file = new File(f, newFileName);
-            if (f.exists()) {
+            String dateStr = dateFormat.format(date);
+            System.out.println("Current Date: " + dateFormat.format(date));
+            String newFileName = "Photo" + bird.getName()+bird.getmId()
+                                        +bird.getPhotos().size()+dateStr+".jpg";
+
+            //File f = getAlbumStorageDir(this.appContext, "Birds");
+            //File file = new File(f, newFileName);
+            File path = Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_PICTURES);
+            File file = new File(path, newFileName);
+
+           // if (file.exists()) {
                 try {
+                    path.mkdirs();
                     FileOutputStream out = new FileOutputStream(file);
                     out.write(data);
                     out.close();
+
+                   /* MediaScannerConnection.scanFile(this,
+                            new String[] { file.toString() }, null,
+                            new MediaScannerConnection.OnScanCompletedListener() {
+                                public void onScanCompleted(String path, Uri uri) {
+                                    Log.i("ExternalStorage", "Scanned " + path + ":");
+                                    Log.i("ExternalStorage", "-> uri=" + uri);
+                                }
+                            }); */
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }
+           // }
             bird.addPhoto(new BirdPhoto(newFileName)); //Kanske måste spara mer än namnet för när man ska hämta
             storeBirdInfo(bird);
         }
@@ -135,8 +155,20 @@ public class BirdBank {
                     in.close();
                     //Näst nästa uppgift: Kolla om det finns lagrat birds, om inte returnera!
                     //Ta ut och skapa en bird
+                    ArrayList<String> nameId = extractBirdName(str1);
+                    Bird bird = new Bird(nameId.get(0), Integer.parseInt(nameId.get(1)));
                    ArrayList<String> photos = getPhotoNames(str1);
-                    //Check photos not null
+                    if (photos != null) {
+                        ArrayList<BirdPhoto> birdPhotos = new ArrayList<BirdPhoto>();
+                        for (String photoStr : photos) {
+                            birdPhotos.add(new BirdPhoto(photoStr));
+                        }
+                        bird.setPhotos(birdPhotos);
+                    }
+                    birds.add(bird);
+                  //  File f = getAlbumStorageDir(this.appContext, "Birds");
+                  //  File[] files = f.listFiles();
+                  //  int i = 1;
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -147,11 +179,18 @@ public class BirdBank {
         }
     }
 
+    private ArrayList<String> extractBirdName(String str) {
+        ArrayList<String> nameId = new ArrayList<String>();
+        String[] tmp = str.split(",");
+        nameId.add(tmp[0]);
+        nameId.add(tmp[1]);
+        return nameId;
+    }
 
     private ArrayList<String> getPhotoNames(String string) {
         ArrayList<String> photoNames = new ArrayList<String>();
         String[] namePhoto = string.split(",");
-        String[] photos = namePhoto[1].split(";");
+        String[] photos = namePhoto[2].split(";");
         int i = 0;
         for (String photoName : photos) {
             if (photoName.startsWith("Photo") && photoName.endsWith(".jpg")) {
