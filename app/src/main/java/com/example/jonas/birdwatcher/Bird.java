@@ -58,7 +58,12 @@ public class Bird implements Parcelable {
 
     @Override
     public String toString() {
-        return this.name;
+        String str = "";
+        str += name+",";
+        for (BirdPhoto photo : photos) {
+            str+= photo.getFileName()+";";
+        }
+        return str;
     }
 
     @Override

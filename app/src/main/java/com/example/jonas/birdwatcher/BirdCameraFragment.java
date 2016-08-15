@@ -63,7 +63,7 @@ public class BirdCameraFragment extends Fragment {
                     success = false;
                 }
             }
-            BirdBank.get(getActivity()).storeBirds(data, birdID);
+            BirdBank.get(getActivity()).storeBirdPhoto(data, birdID);
             if (success) {
                 // set the photo filename on the result intent
                 if (success) {
