@@ -8,32 +8,42 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.jonas.birdwatcher.BirdActivity"
-    android:orientation="horizontal">
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/birdName"
-        android:text="@string/ExempelBirdName"/>
+        android:text="@string/ExempelBirdName"
+        android:textSize="40sp" />
 
-    <ImageButton
+    <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/imageButton"
-        android:src="@android:drawable/ic_menu_camera"/>
-    
-    <ImageView
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:id="@+id/birdImageView"
-        android:scaleType="centerInside"
-        android:background="@android:color/darker_gray"
-        android:cropToPadding="true"/>
-
-    <ListView
-        android:layout_width="match_parent"
+        android:id="@+id/edit_bird_name_field"
+        android:visibility="gone" />
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/bird_photos_listView">
+        android:id="@+id/latin_birdName"
+        android:textSize="30sp"
+        android:textStyle="italic"
+        android:text="@string/ExempelBirdName"/>
 
-    </ListView>
+
+
+
+    </LinearLayout>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/my_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"/>
+
+
 </LinearLayout>

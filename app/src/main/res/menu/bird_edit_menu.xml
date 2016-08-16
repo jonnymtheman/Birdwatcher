@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_item_take_pic"
+        android:icon="@android:drawable/ic_menu_camera"
+        app:showAsAction="ifRoom"
+        android:title="@string/take_pic" />
+
+    <item
+        android:id="@+id/menu_item_edit_bird"
+        android:icon="@android:drawable/ic_menu_edit"
+        app:showAsAction="ifRoom"
+        android:title="@string/bird_edit" />
+
+    <item
+        android:id="@+id/menu_item_delete_bird"
+        android:icon="@android:drawable/ic_menu_delete"
+        app:showAsAction="ifRoom"
+        android:title="@string/bird_delete" />
+
+</menu>

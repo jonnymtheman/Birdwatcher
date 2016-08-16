@@ -16,7 +16,7 @@ import java.util.Date;
 
 /**
  * Ska hålla alla birds, kan vid uppstard ladda in alla fåglar
- *
+ * TODO lägg till deletemetoder
  *
  * File:       ${FILE_NAME}.java
  * Author:     Jonas Nyman
@@ -129,6 +129,7 @@ public class BirdBank {
         }
 
     }
+
 
     //Ska spara bilderna på extrenal, kanske inte behövs
     private void storePhotos() {

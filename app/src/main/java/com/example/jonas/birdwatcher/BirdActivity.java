@@ -10,8 +10,13 @@ import android.os.Environment;
 import android.support.v4.graphics.BitmapCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -23,8 +28,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 /*
-TODO Gör så att man kan ta kort i action baren : Starta kamera activiteten
-TODO gör denna till en scrollview
+
  */
 public class BirdActivity extends AppCompatActivity {
     private static final String TAG = "BirdActivity";
@@ -33,28 +37,47 @@ public class BirdActivity extends AppCompatActivity {
     private static final String BIRD_ID = "BIRD_ID";
     private static final String PHOTO_ID = "PHOTO_ID";
 
-    private TextView birdnameView;
+    private TextView nameView;
+    private TextView latinNameView;
+    private EditText editBirdName;
     private ImageView birdImage;
     private ImageButton imageButton;
-    private ListView photosList;
+    //private ListView photosList;
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     private Bird bird;
+    private ArrayList<BirdPhoto> photos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bird);
 
-        birdnameView = (TextView) findViewById(R.id.birdName);
-        String name = getIntent().getStringExtra("Hej");
+        String birdId = getIntent().getStringExtra("BirdID");
+        bird = BirdBank.get(this).getBird(Integer.parseInt(birdId));
+
+        nameView = (TextView) findViewById(R.id.birdName);
+        nameView.setText(bird.getName());
+        latinNameView = (TextView) findViewById(R.id.latin_birdName);
+        latinNameView.setText(bird.getLatinName());
+
+        editBirdName = (EditText) findViewById(R.id.edit_bird_name_field);
+
+        /*
         bird = getIntent().getParcelableExtra("Hej1");
         ArrayList<BirdPhoto> tmp = getIntent().getParcelableArrayListExtra("Hej2");
         bird.setPhotos(tmp);
-        Log.d(TAG, "Name: "+name);
+        Log.d(TAG, "Name: "+birdId);
         Log.d(TAG, "Bird: " +bird.getName()+","+bird.getmId());
-        birdnameView.setText(name);
+        birdnameView.setText(name); */
 
-        //TODO Check if camera exists
+        photos = new ArrayList<BirdPhoto>();
+        photos = bird.getPhotos();
+
+        /*
+
         imageButton = (ImageButton) findViewById(R.id.imageButton);
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,9 +89,10 @@ public class BirdActivity extends AppCompatActivity {
                 startActivityForResult(intent, REQUEST_PHOTO);
 
             }
-        });
+        }); */
 
 
+        /*
         ArrayList<BirdPhoto> photos1 = bird.getPhotos();
         BirdPhoto photo = bird.getPhotos().get(2);
         Log.d(TAG, "PhotoName:"+photo.getFileName());
@@ -78,9 +102,52 @@ public class BirdActivity extends AppCompatActivity {
         //Bitmap myBitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
         birdImage = (ImageView) findViewById(R.id.birdImageView);
         birdImage.setImageURI(Uri.fromFile(f));
-        photosList = (ListView) findViewById(R.id.bird_photos_listView);
+        */
+      //  photosList = (ListView) findViewById(R.id.bird_photos_listView);
 
 
+        mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        BirdCardAdapter adapter = new BirdCardAdapter(photos);
+        mRecyclerView.setAdapter(adapter);
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.bird_edit_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_item_take_pic :
+                Log.d("LisftFragment", "Tryckte på take pic");
+                Intent intent = new Intent(BirdActivity.this, CameraActivity.class);
+                intent.putExtra(BIRD_NAME, bird.getName());
+                intent.putExtra(BIRD_ID, bird.getmId());
+                intent.putExtra(PHOTO_ID, bird.getPhotos().size());
+                startActivityForResult(intent, REQUEST_PHOTO);
+
+                return true;
+            //TODO Lägg till så att man kan ändra
+            case R.id.menu_item_edit_bird :
+                nameView.setVisibility(View.INVISIBLE);
+                editBirdName.setVisibility(View.VISIBLE);
+
+                return true;
+            case R.id.menu_item_delete_bird :
+                //TODO implementera en delete, ge en popup som säger att
+                //alla bilder kommer att tas bort
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void showPhoto() {

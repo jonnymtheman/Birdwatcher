@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import java.util.ArrayList;
 
 /**
+ * TODO ta bort parceble
  * Hold a photo of a bird
  * File:       BirdPhoto.java
  * Author:     Jonas Nyman

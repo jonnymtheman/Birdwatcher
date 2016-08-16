@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import java.util.ArrayList;
 
 /**
+ * TODO ta bort parceble
  * File:       Bird.java
  * Author:     Jonas Nyman
  * Assignment: Inlämningsuppgift 3 - Valfri Applikation

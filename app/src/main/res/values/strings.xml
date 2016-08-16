@@ -12,4 +12,6 @@
     <string name="latin_name">Latin name:</string>
     <string name="create_bird">Create bird</string>
     <string name="cancel">Cancel</string>
+    <string name="bird_edit">Edit</string>
+    <string name="bird_delete">Delete</string>
 </resources>
