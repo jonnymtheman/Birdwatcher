@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -28,6 +31,7 @@ public class BirdListFragment extends ListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         getActivity().setTitle("Your birds");
 
         //birds = new ArrayList<Bird>();
@@ -40,6 +44,27 @@ public class BirdListFragment extends ListFragment {
         } */
         BirdAdapter adapter = new BirdAdapter(birds);
         setListAdapter(adapter);
+
+        setHasOptionsMenu(true);
+
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.fragment_bird_list, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_item_new_bird :
+                Log.d("LisftFragment", "Tryckte på new bird");
+                Intent intent = new Intent(getActivity(), CreateBirdActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -59,6 +84,7 @@ public class BirdListFragment extends ListFragment {
     @Override
     public void onResume() {
         super.onResume();
+        birds = BirdBank.get(getActivity()).getBirds();
         ((BirdAdapter)getListAdapter()).notifyDataSetChanged();
     }
 

@@ -190,11 +190,13 @@ public class BirdBank {
     private ArrayList<String> getPhotoNames(String string) {
         ArrayList<String> photoNames = new ArrayList<String>();
         String[] namePhoto = string.split(",");
-        String[] photos = namePhoto[2].split(";");
-        int i = 0;
-        for (String photoName : photos) {
-            if (photoName.startsWith("Photo") && photoName.endsWith(".jpg")) {
-                photoNames.add(photoName);
+        if (namePhoto.length == 3) {
+            String[] photos = namePhoto[2].split(";");
+            int i = 0;
+            for (String photoName : photos) {
+                if (photoName.startsWith("Photo") && photoName.endsWith(".jpg")) {
+                    photoNames.add(photoName);
+                }
             }
         }
         return photoNames;
@@ -218,7 +220,8 @@ public class BirdBank {
                 Log.e(TAG, "Error closing file " + filename, e);
             }
         }
-
+        birds.add(bird);
+        int k = 2;
     }
 
     //TODO Directoryn blir inte skapad

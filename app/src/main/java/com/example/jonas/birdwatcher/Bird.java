@@ -15,9 +15,17 @@ import java.util.ArrayList;
 public class Bird implements Parcelable {
 
     private int mId;
-
     private String name;
 
+    public String getLatinName() {
+        return latinName;
+    }
+
+    public void setLatinName(String latinName) {
+        this.latinName = latinName;
+    }
+
+    private String latinName;
     private ArrayList<BirdPhoto> photos;
 
     public Bird(String name, int id) {

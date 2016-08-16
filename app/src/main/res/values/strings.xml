@@ -7,4 +7,9 @@
     <string name="title_activity_bird">BirdActivity</string>
     <string name="action_settings">Settings</string>
     <string name="ExempelBirdName">ExempelBirdRubrik</string>
+    <string name="newBird">New bird</string>
+    <string name="new_bird_name">New bird name:</string>
+    <string name="latin_name">Latin name:</string>
+    <string name="create_bird">Create bird</string>
+    <string name="cancel">Cancel</string>
 </resources>

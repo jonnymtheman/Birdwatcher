@@ -70,7 +70,7 @@ public class BirdActivity extends AppCompatActivity {
 
 
         ArrayList<BirdPhoto> photos1 = bird.getPhotos();
-        BirdPhoto photo = bird.getPhotos().get(1);
+        BirdPhoto photo = bird.getPhotos().get(2);
         Log.d(TAG, "PhotoName:"+photo.getFileName());
         File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).
                 getAbsolutePath(), photo.getFileName()); //"1464691368453.jpg");
