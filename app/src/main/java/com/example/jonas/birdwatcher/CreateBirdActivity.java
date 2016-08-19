@@ -44,7 +44,7 @@ public class CreateBirdActivity extends AppCompatActivity {
         mCancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Log.d(TAG, "Clicked cancel");
             }
         });
     }

@@ -1,13 +1,9 @@
 package com.example.jonas.birdwatcher;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.net.Uri;
-import android.os.Environment;
-import android.support.v4.graphics.BitmapCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,15 +12,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 /*
@@ -39,16 +31,26 @@ public class BirdActivity extends AppCompatActivity {
 
     private TextView nameView;
     private TextView latinNameView;
+    private TextView editNameView;
+
     private EditText editBirdName;
-    private ImageView birdImage;
-    private ImageButton imageButton;
-    //private ListView photosList;
+    private EditText editLatinName;
+
+    private LinearLayout editNameLayout;
+    private LinearLayout editLatinNameLayout;
+    private LinearLayout buttonLayout;
+
+    private Button applyButt;
+    private Button cancelButt;
+    //private ImageView birdImage;
+    //private ImageButton imageButton;
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    //private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
     private Bird bird;
     private ArrayList<BirdPhoto> photos;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +66,15 @@ public class BirdActivity extends AppCompatActivity {
         latinNameView.setText(bird.getLatinName());
 
         editBirdName = (EditText) findViewById(R.id.edit_bird_name_field);
+        editLatinName = (EditText) findViewById(R.id.edit_bird_latin_name_field);
+        editNameView = (TextView) findViewById(R.id.birdName_edit);
+
+        editNameLayout = (LinearLayout) findViewById(R.id.edit_name_layout);
+        editLatinNameLayout = (LinearLayout) findViewById(R.id.edit_latin_name_layout);
+        buttonLayout = (LinearLayout) findViewById(R.id.edit_name_button_layout);
+
+        applyButt = (Button) findViewById(R.id.create_button_bird_activity);
+        cancelButt = (Button) findViewById(R.id.cancel_button_bird_activity);
 
         /*
         bird = getIntent().getParcelableExtra("Hej1");
@@ -134,20 +145,96 @@ public class BirdActivity extends AppCompatActivity {
                 startActivityForResult(intent, REQUEST_PHOTO);
 
                 return true;
-            //TODO Lägg till så att man kan ändra
-            case R.id.menu_item_edit_bird :
-                nameView.setVisibility(View.INVISIBLE);
-                editBirdName.setVisibility(View.VISIBLE);
 
+            case R.id.menu_item_edit_bird :
+                toggleEditFieldsVisibility();
+
+                applyButt.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Log.d(TAG, editBirdName.getText().toString()+","+
+                        editLatinName.getText().toString());
+                        applyChanges(editBirdName.getText().toString(),
+                                editLatinName.getText().toString());
+                        toggleEditFieldsVisibility();
+                    }
+                });
+                cancelButt.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Log.d(TAG, "Klickade cancel");
+                        toggleEditFieldsVisibility();
+                    }
+                });
                 return true;
+
             case R.id.menu_item_delete_bird :
-                //TODO implementera en delete, ge en popup som säger att
-                //alla bilder kommer att tas bort
+                //TODO implementera
+                displayDialog();
                 return true;
 
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void toggleEditFieldsVisibility() {
+        if (nameView.getVisibility() == View.VISIBLE) {
+            nameView.setVisibility(View.GONE);
+            latinNameView.setVisibility(View.GONE);
+            editNameLayout.setVisibility(View.VISIBLE);
+            editLatinNameLayout.setVisibility(View.VISIBLE);
+            buttonLayout.setVisibility(View.VISIBLE);
+        } else  {
+            nameView.setVisibility(View.VISIBLE);
+            latinNameView.setVisibility(View.VISIBLE);
+            editNameLayout.setVisibility(View.GONE);
+            editLatinNameLayout.setVisibility(View.GONE);
+            buttonLayout.setVisibility(View.GONE);
+        }
+    }
+
+    private void displayDialog() {
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        dialogBuilder.setTitle(R.string.delete_dialog_title);
+        if (photos.size() == 0) {
+            dialogBuilder.setMessage(R.string.delete_dialog_content);
+        } else {
+            dialogBuilder.setMessage(R.string.delete_dialog_content_phots);
+        }
+        dialogBuilder.setCancelable(true);
+        dialogBuilder.setPositiveButton(R.string.ok_button, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Log.d(TAG, "Clicked ok in dialog");
+                applyDeleteBird();
+            }
+        });
+        dialogBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Log.d(TAG, "Clicked cancel in dialog");
+            }
+        });
+
+        AlertDialog deleteDialog = dialogBuilder.create();
+        deleteDialog.show();
+
+    }
+
+    private void applyDeleteBird() {
+        BirdBank.get(this).deleteBirdInfo(bird);
+        finish();
+    }
+
+    private void applyChanges(String name, String latinName) {
+        bird.setName(name);
+        bird.setLatinName(latinName);
+        BirdBank.get(this).updateBird(bird);
+
+        nameView.setText(bird.getName());
+        latinNameView.setText(bird.getLatinName());
     }
 
     private void showPhoto() {

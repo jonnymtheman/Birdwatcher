@@ -14,4 +14,10 @@
     <string name="cancel">Cancel</string>
     <string name="bird_edit">Edit</string>
     <string name="bird_delete">Delete</string>
+    <string name="bird_name">Bird name:</string>
+    <string name="apply_changes">Apply changes</string>
+    <string name="delete_dialog_title">Delete bird</string>
+    <string name="delete_dialog_content_phots">Delete bird but keep photos?</string>
+    <string name="delete_dialog_content">Delete bird?</string>
+    <string name="ok_button">Ok</string>
 </resources>

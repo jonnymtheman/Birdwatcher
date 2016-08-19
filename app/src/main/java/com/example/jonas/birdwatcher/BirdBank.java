@@ -66,6 +66,9 @@ public class BirdBank {
         for (Bird b : birds) {
             if (b.getmId() == bird.getmId()) {
                 b.setPhotos(bird.getPhotos());
+                b.setName(bird.getName());
+                b.setLatinName(bird.getLatinName());
+                storeBirdInfo(b);
             }
         }
     }
@@ -139,7 +142,7 @@ public class BirdBank {
 
     // Ska hämta sparade på internal memory och external memory
     //När appen startas. Tänk på filnamnen, kanske behöver lägga till
-    //mer.
+    //mer. TODO hämta latin name
     public void loadBirds() {
         String str[] = this.appContext.fileList();
         for (String s : str) {
@@ -204,6 +207,7 @@ public class BirdBank {
     }
 
     // Ska spara infon om fåglarna på internal storage
+    //TODO fixa latin name
     public void storeBirdInfo(Bird bird) {
         Log.d(TAG, "inne i storebirdInfo");
         String filename = "Bird:"+bird.getName();
@@ -221,8 +225,36 @@ public class BirdBank {
                 Log.e(TAG, "Error closing file " + filename, e);
             }
         }
-        birds.add(bird);
+        if (!isBirdAdded(bird)) {
+            birds.add(bird);
+        }
+
         int k = 2;
+    }
+
+    public void deleteBirdInfo(Bird bird) {
+        Log.d(TAG, "inne i deletebirdInfo");
+        String filename = "Bird:"+bird.getName();
+        int count = 0;
+        for (Bird b : birds) {
+            if (b.getmId() == bird.getmId()) {
+                if (b.getName() == bird.getName()) {
+                    birds.remove(count);
+                    break;
+                }
+            }
+            count++;
+        }
+        this.appContext.deleteFile(filename);
+    }
+
+    private boolean isBirdAdded(Bird bird) {
+        for (Bird b : birds) {
+            if (b.getmId() == bird.getmId()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     //TODO Directoryn blir inte skapad
