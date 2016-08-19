@@ -43,10 +43,10 @@ public class BirdCameraFragment extends Fragment {
     private Camera.PictureCallback mJpegCallBack = new Camera.PictureCallback() {
         public void onPictureTaken(byte[] data, Camera camera) {
             // create a filename
-            String filename = birdName + birdID + birdPhotoID +".jpg"; //UUID.randomUUID().toString() + ".jpg";
+            String filename = birdID + birdPhotoID +".jpg"; //UUID.randomUUID().toString() + ".jpg";
             Log.d(TAG, "FileName: "+filename);
             // save the jpeg data to disk
-            FileOutputStream os = null;
+           /* FileOutputStream os = null;
             boolean success = true;
             try {
                 os = getActivity().openFileOutput(filename, Context.MODE_PRIVATE);
@@ -62,9 +62,9 @@ public class BirdCameraFragment extends Fragment {
                     Log.e(TAG, "Error closing file " + filename, e);
                     success = false;
                 }
-            }
+            } */
             BirdBank.get(getActivity()).storeBirdPhoto(data, birdID);
-            if (success) {
+          /*  if (success) {
                 // set the photo filename on the result intent
                 if (success) {
                     Intent i = new Intent();
@@ -75,7 +75,7 @@ public class BirdCameraFragment extends Fragment {
                     getActivity().setResult(Activity.RESULT_CANCELED);
                     Log.d(TAG, "Failed: "+filename);
                 }
-            }
+            } */
             getActivity().finish();
         }
     };

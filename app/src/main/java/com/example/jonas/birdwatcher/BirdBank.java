@@ -5,11 +5,16 @@ import android.media.MediaScannerConnection;
 import android.os.Environment;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -97,7 +102,7 @@ public class BirdBank {
 
             String dateStr = dateFormat.format(date);
             System.out.println("Current Date: " + dateFormat.format(date));
-            String newFileName = "Photo" + bird.getName()+bird.getmId()
+            String newFileName = "Photo"+bird.getmId()
                                         +bird.getPhotos().size()+dateStr+".jpg";
 
             //File f = getAlbumStorageDir(this.appContext, "Birds");
@@ -153,14 +158,27 @@ public class BirdBank {
                     //byte[] buffer = new byte[1024];
                     String str1 ="";
                     int re;
-                    while ((re = in.read()) != -1) {
-                        str1 += (char)re;
+                    BufferedReader red = new BufferedReader(new InputStreamReader(in));
+
+
+
+
+                    StringBuilder sb =  new StringBuilder();
+                    while ((str1 = red.readLine()) != null) {
+                        sb.append(str1);
+                        // do something with your read line
                     }
-                    in.close();
+                    str1 = sb.toString();
+                    red.close();
+                   // while ((re = in.read()) != -1) {
+                   //     str1 += (char)re;
+                   // }
+                   // in.close();
                     //Näst nästa uppgift: Kolla om det finns lagrat birds, om inte returnera!
                     //Ta ut och skapa en bird
                     ArrayList<String> nameId = extractBirdName(str1);
-                    Bird bird = new Bird(nameId.get(0), Integer.parseInt(nameId.get(1)));
+                    Bird bird = new Bird(nameId.get(0),nameId.get(1) ,Integer.parseInt(nameId.get(2)));
+                   // bird.setLatinName(nameId.get(2));
                    ArrayList<String> photos = getPhotoNames(str1);
                     if (photos != null) {
                         ArrayList<BirdPhoto> birdPhotos = new ArrayList<BirdPhoto>();
@@ -188,14 +206,16 @@ public class BirdBank {
         String[] tmp = str.split(",");
         nameId.add(tmp[0]);
         nameId.add(tmp[1]);
+        nameId.add(tmp[2]);
+
         return nameId;
     }
 
     private ArrayList<String> getPhotoNames(String string) {
         ArrayList<String> photoNames = new ArrayList<String>();
         String[] namePhoto = string.split(",");
-        if (namePhoto.length == 3) {
-            String[] photos = namePhoto[2].split(";");
+        if (namePhoto.length == 4) {
+            String[] photos = namePhoto[3].split(";");
             int i = 0;
             for (String photoName : photos) {
                 if (photoName.startsWith("Photo") && photoName.endsWith(".jpg")) {
@@ -212,8 +232,11 @@ public class BirdBank {
         Log.d(TAG, "inne i storebirdInfo");
         String filename = "Bird:"+bird.getName();
         FileOutputStream os = null;
+        String te = bird.toString();
         try {
             os = this.appContext.openFileOutput(filename, Context.MODE_PRIVATE);
+            //Writer writer = new OutputStreamWriter(os, Charset.forName("UTF-8"));
+            //writer.write(bird.toString());
             os.write(bird.toString().getBytes());
         } catch (Exception e) {
             Log.e(TAG, "Error writing to file " + filename, e);

@@ -53,7 +53,7 @@ public class CreateBirdActivity extends AppCompatActivity {
         Log.d(TAG, "Real name: "+name);
         Log.d(TAG, "Real Latin name: "+latinName);
         int id = BirdBank.get(this).getBirds().size();
-        Bird bird = new Bird(nameString, id);
+        Bird bird = new Bird(nameString,latinName, id);
         BirdBank.get(this).storeBirdInfo(bird);
         finish();
     }

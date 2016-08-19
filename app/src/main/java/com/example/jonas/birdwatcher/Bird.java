@@ -29,9 +29,10 @@ public class Bird implements Parcelable {
     private String latinName;
     private ArrayList<BirdPhoto> photos;
 
-    public Bird(String name, int id) {
+    public Bird(String name, String latinName, int id) {
         this.name = name;
-        mId = id;
+        this.latinName = latinName;
+        this.mId = id;
         photos = new ArrayList<BirdPhoto>();
 
     }
@@ -68,7 +69,7 @@ public class Bird implements Parcelable {
     @Override
     public String toString() {
         String str = "";
-        str += name+","+mId+",";
+        str += name+","+latinName+","+mId+",";
 
         for (BirdPhoto photo : photos) {
             str+= photo.getFileName()+";";
