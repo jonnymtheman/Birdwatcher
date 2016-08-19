@@ -10,6 +10,7 @@ public class CameraActivity extends SingleFragmentActivity {
 
 //TODO hide app bar
     //TODO kolla kameran i lektionerna
+    //TODO testa köra kameran i egen tråd
     @Override
     public void onCreate(Bundle savedInstanceState) {
         // hide the window title.

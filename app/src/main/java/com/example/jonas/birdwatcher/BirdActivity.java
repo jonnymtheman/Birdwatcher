@@ -169,7 +169,6 @@ public class BirdActivity extends AppCompatActivity {
                 return true;
 
             case R.id.menu_item_delete_bird :
-                //TODO implementera
                 displayDialog();
                 return true;
 

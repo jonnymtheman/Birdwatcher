@@ -138,13 +138,11 @@ public class BirdBank {
 
     }
 
+    //TODO implementera
+    //TODO kolla om det är värt att ladda in/deleta i egna trådar(förmodligen inte)
+    public void deleteBirdPhoto(String photoName) {
 
-    //Ska spara bilderna på extrenal, kanske inte behövs
-    private void storePhotos() {
-
-    } //Name0.Photo0:Name001Mon Aug 15 14:59:04 GMT+02:00 2016.jpg:
-
-
+    }
     // Ska hämta sparade på internal memory och external memory
     //När appen startas. Tänk på filnamnen, kanske behöver lägga till
     //mer. TODO hämta latin name

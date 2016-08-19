@@ -1,12 +1,16 @@
 package com.example.jonas.birdwatcher;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,16 +28,42 @@ public class BirdCardAdapter extends RecyclerView.Adapter<BirdCardAdapter.MyView
 
     private Context mContext;
     private ArrayList<BirdPhoto> photos;
+    private Button deleteButton;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView birdNameText;
         private ImageView imageView;
 
         public MyViewHolder(View view) {
             super(view);
-            birdNameText = (TextView) view.findViewById(R.id.card_bird_name);
+
             imageView = (ImageView) view.findViewById(R.id.bird_card_imageView);
+            deleteButton = (Button) view.findViewById(R.id.delete_card_button);
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(view.getContext());
+                    dialogBuilder.setTitle(R.string.delete_dialog_card_title).
+                            setMessage(R.string.delete_dialog_card_msg).
+                            setCancelable(true);
+                    dialogBuilder.setPositiveButton(R.string.ok_button, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Log.d("TAG", "Clicked ok in dialog");
+                            //TODO implementera borttagning av bilder
+                        }
+                    });
+                    dialogBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Log.d("TAG", "Clicked cancel in dialog");
+                        }
+                    });
+
+                    AlertDialog dialog = dialogBuilder.create();
+                    dialog.show();
+                }
+            });
 
         }
 
@@ -52,10 +82,10 @@ public class BirdCardAdapter extends RecyclerView.Adapter<BirdCardAdapter.MyView
         return new MyViewHolder(itemView);
     }
 
+    //TODO kanske ska kolla om man kan ladda in dom innan
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         BirdPhoto photo = photos.get(position);
-        holder.birdNameText.setText(photo.getFileName());
         File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).
                 getAbsolutePath(), photo.getFileName()); //"1464691368453.jpg");
         String fstr = f.getAbsolutePath();
