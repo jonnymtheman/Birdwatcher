@@ -3,6 +3,7 @@ package com.example.jonas.birdwatcher;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /*
@@ -76,51 +78,22 @@ public class BirdActivity extends AppCompatActivity {
         applyButt = (Button) findViewById(R.id.create_button_bird_activity);
         cancelButt = (Button) findViewById(R.id.cancel_button_bird_activity);
 
-        /*
-        bird = getIntent().getParcelableExtra("Hej1");
-        ArrayList<BirdPhoto> tmp = getIntent().getParcelableArrayListExtra("Hej2");
-        bird.setPhotos(tmp);
-        Log.d(TAG, "Name: "+birdId);
-        Log.d(TAG, "Bird: " +bird.getName()+","+bird.getmId());
-        birdnameView.setText(name); */
-
         photos = new ArrayList<BirdPhoto>();
         photos = bird.getPhotos();
 
-        /*
+        ArrayList<File> photoFiles = new ArrayList<File>();
+        for (BirdPhoto photo : photos) {
+            File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).
+                    getAbsolutePath(), photo.getFileName());
+            photoFiles.add(f);
+        }
 
-        imageButton = (ImageButton) findViewById(R.id.imageButton);
-        imageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(BirdActivity.this, CameraActivity.class);
-                intent.putExtra(BIRD_NAME, bird.getName());
-                intent.putExtra(BIRD_ID, bird.getmId());
-                intent.putExtra(PHOTO_ID, bird.getPhotos().size());
-                startActivityForResult(intent, REQUEST_PHOTO);
-
-            }
-        }); */
-
-
-        /*
-        ArrayList<BirdPhoto> photos1 = bird.getPhotos();
-        BirdPhoto photo = bird.getPhotos().get(2);
-        Log.d(TAG, "PhotoName:"+photo.getFileName());
-        File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).
-                getAbsolutePath(), photo.getFileName()); //"1464691368453.jpg");
-        String fstr = f.getAbsolutePath();
-        //Bitmap myBitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
-        birdImage = (ImageView) findViewById(R.id.birdImageView);
-        birdImage.setImageURI(Uri.fromFile(f));
-        */
-      //  photosList = (ListView) findViewById(R.id.bird_photos_listView);
 
 
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        BirdCardAdapter adapter = new BirdCardAdapter(photos);
+        BirdCardAdapter adapter = new BirdCardAdapter(photos, photoFiles);
         mRecyclerView.setAdapter(adapter);
     }
 

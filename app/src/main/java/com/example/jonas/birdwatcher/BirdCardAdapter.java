@@ -2,7 +2,10 @@ package com.example.jonas.birdwatcher;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +17,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -25,10 +31,13 @@ import java.util.ArrayList;
  */
 public class BirdCardAdapter extends RecyclerView.Adapter<BirdCardAdapter.MyViewHolder> {
 
+    private final String TAG = "BIRDCARDADAPTER";
     private Context mContext;
     private ArrayList<BirdPhoto> photos;
+    private ArrayList<File> photoFiles;
     private Button deleteButton;
 
+   // private ImageView imageView;
     private String photoName;
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
@@ -80,9 +89,9 @@ public class BirdCardAdapter extends RecyclerView.Adapter<BirdCardAdapter.MyView
 
     }
 
-    public BirdCardAdapter(ArrayList<BirdPhoto> photos) {
-            //this.mContext = context;
+    public BirdCardAdapter(ArrayList<BirdPhoto> photos, ArrayList<File> photoFiles) {
             this.photos = photos;
+            this.photoFiles = photoFiles;
     }
 
     public void updatePhotoList() {
@@ -102,27 +111,69 @@ public class BirdCardAdapter extends RecyclerView.Adapter<BirdCardAdapter.MyView
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         BirdPhoto photo = photos.get(position);
         photoName = photo.getFileName();
-        File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).
+
+       /* File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).
                 getAbsolutePath(), photo.getFileName()); //"1464691368453.jpg");
         String fstr = f.getAbsolutePath();
-        //Bitmap myBitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
         holder.imageView.setImageURI(Uri.fromFile(f));
-                      /*
-        ArrayList<BirdPhoto> photos1 = bird.getPhotos();
-        BirdPhoto photo = bird.getPhotos().get(2);
-        Log.d(TAG, "PhotoName:"+photo.getFileName());
-        File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).
-                getAbsolutePath(), photo.getFileName()); //"1464691368453.jpg");
-        String fstr = f.getAbsolutePath();
-        //Bitmap myBitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
-        birdImage = (ImageView) findViewById(R.id.birdImageView);
-        birdImage.setImageURI(Uri.fromFile(f));
-        */
+        //File f = photoFiles.get(position);
+        //holder.imageView.setImageURI(Uri.fromFile(f)); */
+
+        new AsyncTask<RecyclerView.ViewHolder, Void, Bitmap>() {
+
+            @Override
+            protected Bitmap doInBackground(RecyclerView.ViewHolder... viewHolders) {
+                Bitmap bitmap = null;
+                Bitmap scaled = null;
+
+                File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).
+                        getAbsolutePath(), photoName);
+                bitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
+                int nh = (int) (bitmap.getHeight() * (1100.0 / bitmap.getWidth())); //512.0
+                scaled = Bitmap.createScaledBitmap(bitmap, 1100, nh, true); //512
+                return scaled;
+            }
+            @Override
+            protected void onPostExecute(Bitmap bm) {
+                holder.imageView.setImageBitmap(bm);
+            }
+        }.execute(holder);
+        //new loadBirdPicture().execute(photoName);
     }
 
     @Override
     public int getItemCount() {
         return photos.size();
+    }
+
+    private class loadBirdPicture extends AsyncTask<String, String, Bitmap> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Bitmap doInBackground(String... strings) {
+            Log.d(TAG, "inne i doBack");
+            Log.d(TAG, "Filename: "+strings[0]);
+            Bitmap bitmap = null;
+            Bitmap scaled = null;
+
+                File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).
+                        getAbsolutePath(), strings[0]);
+                bitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
+                int nh = (int) (bitmap.getHeight() * (1100.0 / bitmap.getWidth())); //512.0
+                scaled = Bitmap.createScaledBitmap(bitmap, 1100, nh, true); //512
+
+            return scaled;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap f) {
+                Log.d(TAG, "Inne i onPost");
+               // imageView.setImageBitmap(f);
+        }
     }
 
 }
