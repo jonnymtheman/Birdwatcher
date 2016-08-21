@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,6 +29,7 @@ public class BirdCardAdapter extends RecyclerView.Adapter<BirdCardAdapter.MyView
     private ArrayList<BirdPhoto> photos;
     private Button deleteButton;
 
+    private String photoName;
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
         private ImageView imageView;
@@ -37,11 +37,13 @@ public class BirdCardAdapter extends RecyclerView.Adapter<BirdCardAdapter.MyView
         public MyViewHolder(View view) {
             super(view);
 
+            photoName = "";
+
             imageView = (ImageView) view.findViewById(R.id.bird_card_imageView);
             deleteButton = (Button) view.findViewById(R.id.delete_card_button);
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View view) {
+                public void onClick(final View view) {
                     AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(view.getContext());
                     dialogBuilder.setTitle(R.string.delete_dialog_card_title).
                             setMessage(R.string.delete_dialog_card_msg).
@@ -50,7 +52,16 @@ public class BirdCardAdapter extends RecyclerView.Adapter<BirdCardAdapter.MyView
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             Log.d("TAG", "Clicked ok in dialog");
-                            //TODO implementera borttagning av bilder
+                            BirdBank.get(view.getContext()).deleteBirdPhoto(photoName);
+                            int count = 0;
+                            for (BirdPhoto photo1 : photos) {
+                                if (photo1.getFileName().equals(photoName)) {
+                                    photos.remove(count);
+                                }
+                                count++;
+                            }
+
+                            updatePhotoList();
                         }
                     });
                     dialogBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -74,6 +85,10 @@ public class BirdCardAdapter extends RecyclerView.Adapter<BirdCardAdapter.MyView
             this.photos = photos;
     }
 
+    public void updatePhotoList() {
+        notifyDataSetChanged();
+    }
+
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
@@ -86,6 +101,7 @@ public class BirdCardAdapter extends RecyclerView.Adapter<BirdCardAdapter.MyView
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         BirdPhoto photo = photos.get(position);
+        photoName = photo.getFileName();
         File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).
                 getAbsolutePath(), photo.getFileName()); //"1464691368453.jpg");
         String fstr = f.getAbsolutePath();
@@ -108,4 +124,5 @@ public class BirdCardAdapter extends RecyclerView.Adapter<BirdCardAdapter.MyView
     public int getItemCount() {
         return photos.size();
     }
+
 }

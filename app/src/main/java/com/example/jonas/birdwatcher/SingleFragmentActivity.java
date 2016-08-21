@@ -5,11 +5,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 
 /**
- * Example from book. TODO, action bar och context menu
+ * Example from book.
  */
-public abstract class SingleFragmentActivity extends ActionBarActivity {
+public abstract class SingleFragmentActivity extends AppCompatActivity {
     protected abstract Fragment createFragment();
 
     @Override

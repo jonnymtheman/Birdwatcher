@@ -8,7 +8,6 @@ import android.view.WindowManager;
 
 public class CameraActivity extends SingleFragmentActivity {
 
-//TODO hide app bar
     //TODO kolla kameran i lektionerna
     //TODO testa köra kameran i egen tråd
     @Override
@@ -16,8 +15,10 @@ public class CameraActivity extends SingleFragmentActivity {
         // hide the window title.
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         // hide the status bar and other OS-level chrome
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
     @Override

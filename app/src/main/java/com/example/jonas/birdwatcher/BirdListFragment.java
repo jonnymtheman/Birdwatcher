@@ -67,17 +67,12 @@ public class BirdListFragment extends ListFragment {
         }
     }
 
-    //TODO behöver bara skiicka birdID och sen hämta med BirdBank
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
 
         Bird bird = ((BirdAdapter)getListAdapter()).getItem(position);
-        Log.d("InnanPos", "Position: "+position);
-        Log.d("Innan", ""+bird.getName()+","+bird.getmId());
         Intent i = new Intent(getActivity(), BirdActivity.class);
         i.putExtra("BirdID", ""+bird.getmId());
-        //i.putExtra("Hej1", bird);
-        //i.putParcelableArrayListExtra("Hej2",bird.getPhotos());
         startActivity(i);
     }
 

@@ -228,9 +228,15 @@ public class BirdActivity extends AppCompatActivity {
     }
 
     private void applyChanges(String name, String latinName) {
+        Bird newBird = new Bird(name, latinName, bird.getmId());
+        BirdBank.get(this).deleteBirdInfo(bird);
+        ArrayList<Bird> bird1 = BirdBank.get(this).getBirds();
+        BirdBank.get(this).storeBirdInfo(newBird);
+        ArrayList<Bird> bird2 = BirdBank.get(this).getBirds();
+        bird = newBird;
         bird.setName(name);
         bird.setLatinName(latinName);
-        BirdBank.get(this).updateBird(bird);
+        //BirdBank.get(this).updateBird(bird, name, latinName);
 
         nameView.setText(bird.getName());
         latinNameView.setText(bird.getLatinName());

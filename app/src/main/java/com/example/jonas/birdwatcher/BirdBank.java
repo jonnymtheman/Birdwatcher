@@ -21,7 +21,6 @@ import java.util.Date;
 
 /**
  * Ska hålla alla birds, kan vid uppstard ladda in alla fåglar
- * TODO lägg till deletemetoder
  *
  * File:       ${FILE_NAME}.java
  * Author:     Jonas Nyman
@@ -77,6 +76,21 @@ public class BirdBank {
             }
         }
     }
+
+
+
+
+    /*
+
+     public void updateBird(Bird oldBird, String name, String latinName) {
+        for (Bird bird : birds) {
+            if (bird.getmId() == oldBird.getmId()) {
+                deleteBirdInfo(oldBird);
+                storeBirdInfo(bird);
+            }
+        }
+    }
+     */
 
     public Bird getBird(int id) {
         for (Bird bird : birds) {
@@ -138,14 +152,42 @@ public class BirdBank {
 
     }
 
-    //TODO implementera
-    //TODO kolla om det är värt att ladda in/deleta i egna trådar(förmodligen inte)
     public void deleteBirdPhoto(String photoName) {
+        File path = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+        File file = new File(path, photoName);
+        Boolean deleted = file.delete();
+        if (deleted) {
+            Log.d(TAG, "Deleted: "+photoName);
+            for (Bird bird : birds) {
+                for (BirdPhoto photo : bird.getPhotos()) {
+                    if (photo.getFileName().equals(photoName)) {
+                        removePhotoFromBird(photoName, bird);
+                    }
+                }
+            }
+        } else {
+            Log.d(TAG, "Not deleted: "+photoName);
+        }
 
     }
-    // Ska hämta sparade på internal memory och external memory
+
+    private void removePhotoFromBird(String photoName, Bird bird) {
+        ArrayList<BirdPhoto> tmp = bird.getPhotos();
+        if (tmp != null) {
+            int count = 0;
+            for (BirdPhoto photo : tmp) {
+                if (photo.getFileName().equals(photoName)) {
+                    tmp.remove(count);
+                    bird.setPhotos(tmp);
+                    break;
+                }
+                count++;
+            }
+        }
+    }
+
     //När appen startas. Tänk på filnamnen, kanske behöver lägga till
-    //mer. TODO hämta latin name
     public void loadBirds() {
         String str[] = this.appContext.fileList();
         for (String s : str) {
@@ -225,7 +267,6 @@ public class BirdBank {
     }
 
     // Ska spara infon om fåglarna på internal storage
-    //TODO fixa latin name
     public void storeBirdInfo(Bird bird) {
         Log.d(TAG, "inne i storebirdInfo");
         String filename = "Bird:"+bird.getName();
@@ -278,7 +319,6 @@ public class BirdBank {
         return false;
     }
 
-    //TODO Directoryn blir inte skapad
     public File getAlbumStorageDir(Context context, String albumName) {
         // Get the directory for the app's private pictures directory.
         File file = new File(context.getExternalFilesDir(
