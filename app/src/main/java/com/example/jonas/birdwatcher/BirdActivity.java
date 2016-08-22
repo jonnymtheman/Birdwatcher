@@ -3,6 +3,8 @@ package com.example.jonas.birdwatcher;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -22,7 +24,15 @@ import java.io.File;
 import java.util.ArrayList;
 
 /*
+TODO fixa bugg att den tar bort fel bild
+Detta går nog inte att fixa bra för att cardviewn suger om det är >= 4 bilder.
+Öppna en lista med bara filnamnen där man kan ta bort bilder,
+en fullösning men det borde funka. Kolla buggar i BirdBank bara.
 
+En till grej, om man har stängt av camera permission så kommer den inte
+att upptäcka det.
+
+Snygga till layouts och kod, kolla sen på camera permission.
  */
 public class BirdActivity extends AppCompatActivity {
     private static final String TAG = "BirdActivity";
@@ -98,6 +108,12 @@ public class BirdActivity extends AppCompatActivity {
     }
 
 
+    public void showLargerImage(String photoname) {
+        Intent intent = new Intent(BirdActivity.this, BirdImageActivity.class);
+        intent.putExtra("Name", photoname);
+        startActivity(intent);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -111,12 +127,22 @@ public class BirdActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menu_item_take_pic :
                 Log.d("LisftFragment", "Tryckte på take pic");
-                Intent intent = new Intent(BirdActivity.this, CameraActivity.class);
-                intent.putExtra(BIRD_NAME, bird.getName());
-                intent.putExtra(BIRD_ID, bird.getmId());
-                intent.putExtra(PHOTO_ID, bird.getPhotos().size());
-                startActivityForResult(intent, REQUEST_PHOTO);
+                PackageManager pm = getPackageManager();
+                if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
+                    new AsyncTask<Integer, Void, String>() {
 
+                        @Override
+                        protected String doInBackground(Integer... integers) {
+                            Intent intent = new Intent(BirdActivity.this, CameraActivity.class);
+                            intent.putExtra(BIRD_NAME, bird.getName());
+                            intent.putExtra(BIRD_ID, bird.getmId());
+                            intent.putExtra(PHOTO_ID, bird.getPhotos().size());
+                            startActivityForResult(intent, integers[0]);
+                            return null;
+                        }
+                    }.execute(REQUEST_PHOTO);
+
+                }
                 return true;
 
             case R.id.menu_item_edit_bird :

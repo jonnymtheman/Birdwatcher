@@ -8,8 +8,7 @@ import android.view.WindowManager;
 
 public class CameraActivity extends SingleFragmentActivity {
 
-    //TODO kolla kameran i lektionerna
-    //TODO testa köra kameran i egen tråd
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         // hide the window title.

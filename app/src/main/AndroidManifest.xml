@@ -28,7 +28,11 @@
         </activity>
         <activity android:name=".BirdListActivity" />
         <activity android:name=".BirdActivity" />
-        <activity android:name=".CreateBirdActivity"></activity>
+        <activity android:name=".CreateBirdActivity" />
+        <activity android:name=".BirdImageActivity"
+            android:screenOrientation="landscape">
+
+        </activity>
     </application>
 
 </manifest>

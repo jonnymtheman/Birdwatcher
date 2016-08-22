@@ -46,37 +46,9 @@ public class BirdCameraFragment extends Fragment {
             // create a filename
             String filename = birdID + birdPhotoID +".jpg"; //UUID.randomUUID().toString() + ".jpg";
             Log.d(TAG, "FileName: "+filename);
-            // save the jpeg data to disk
-           /* FileOutputStream os = null;
-            boolean success = true;
-            try {
-                os = getActivity().openFileOutput(filename, Context.MODE_PRIVATE);
-                os.write(data);
-            } catch (Exception e) {
-                Log.e(TAG, "Error writing to file " + filename, e);
-                success = false;
-            } finally {
-                try {
-                    if (os != null)
-                        os.close();
-                } catch (Exception e) {
-                    Log.e(TAG, "Error closing file " + filename, e);
-                    success = false;
-                }
-            } */
+
             BirdBank.get(getActivity()).storeBirdPhoto(data, birdID);
-          /*  if (success) {
-                // set the photo filename on the result intent
-                if (success) {
-                    Intent i = new Intent();
-                    i.putExtra(EXTRA_PHOTO_FILENAME, filename);
-                    getActivity().setResult(Activity.RESULT_OK, i);
-                    Log.d(TAG, "File:"+filename);
-                } else {
-                    getActivity().setResult(Activity.RESULT_CANCELED);
-                    Log.d(TAG, "Failed: "+filename);
-                }
-            } */
+
             getActivity().finish();
         }
     };

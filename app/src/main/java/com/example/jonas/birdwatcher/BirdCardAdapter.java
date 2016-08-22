@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
@@ -15,11 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -37,15 +34,25 @@ public class BirdCardAdapter extends RecyclerView.Adapter<BirdCardAdapter.MyView
     private ArrayList<File> photoFiles;
     private Button deleteButton;
 
+    private View mView;
    // private ImageView imageView;
     private String photoName;
+    boolean isFail = false;
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
         private ImageView imageView;
 
         public MyViewHolder(View view) {
             super(view);
-
+            mView = view;
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //Intent intent = new Intent(view.getContext(), BirdActivity.class);
+                    //intent.putExtra("Disp", "Dips");
+                    ((BirdActivity)view.getContext()).showLargerImage(photoName);
+                }
+            });
             photoName = "";
 
             imageView = (ImageView) view.findViewById(R.id.bird_card_imageView);
@@ -61,16 +68,19 @@ public class BirdCardAdapter extends RecyclerView.Adapter<BirdCardAdapter.MyView
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             Log.d("TAG", "Clicked ok in dialog");
-                            BirdBank.get(view.getContext()).deleteBirdPhoto(photoName);
                             int count = 0;
                             for (BirdPhoto photo1 : photos) {
                                 if (photo1.getFileName().equals(photoName)) {
                                     photos.remove(count);
+                                    break;
                                 }
                                 count++;
                             }
+                            BirdBank.get(view.getContext()).deleteBirdPhoto(photoName);
 
-                            updatePhotoList();
+
+                            //updatePhotoList();
+                            notifyDataSetChanged();
                         }
                     });
                     dialogBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -106,18 +116,13 @@ public class BirdCardAdapter extends RecyclerView.Adapter<BirdCardAdapter.MyView
         return new MyViewHolder(itemView);
     }
 
-    //TODO kanske ska kolla om man kan ladda in dom innan
+    private void displayToast() {
+        Toast.makeText(mView.getContext(), "Unable to read storage", Toast.LENGTH_SHORT).show();
+    }
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         BirdPhoto photo = photos.get(position);
         photoName = photo.getFileName();
-
-       /* File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).
-                getAbsolutePath(), photo.getFileName()); //"1464691368453.jpg");
-        String fstr = f.getAbsolutePath();
-        holder.imageView.setImageURI(Uri.fromFile(f));
-        //File f = photoFiles.get(position);
-        //holder.imageView.setImageURI(Uri.fromFile(f)); */
 
         new AsyncTask<RecyclerView.ViewHolder, Void, Bitmap>() {
 
@@ -128,17 +133,30 @@ public class BirdCardAdapter extends RecyclerView.Adapter<BirdCardAdapter.MyView
 
                 File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).
                         getAbsolutePath(), photoName);
-                bitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
-                int nh = (int) (bitmap.getHeight() * (1100.0 / bitmap.getWidth())); //512.0
-                scaled = Bitmap.createScaledBitmap(bitmap, 1100, nh, true); //512
-                return scaled;
+                if (f.isFile()) {
+                    bitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
+                    if (bitmap != null) {
+                        int nh = (int) (bitmap.getHeight() * (1100.0 / bitmap.getWidth())); //512.0
+                        scaled = Bitmap.createScaledBitmap(bitmap, 1100, nh, true); //512
+                        return scaled;
+                    }
+                   isFail = true;
+                }
+                    return null;
+
             }
             @Override
             protected void onPostExecute(Bitmap bm) {
-                holder.imageView.setImageBitmap(bm);
+                if (bm != null) {
+                    holder.imageView.setImageBitmap(bm);
+                }
             }
         }.execute(holder);
-        //new loadBirdPicture().execute(photoName);
+
+        if (isFail) {
+            displayToast();
+        }
+
     }
 
     @Override
