@@ -15,12 +15,12 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/birdName"
-        android:text="@string/ExempelBirdName"
-        android:textSize="40sp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/birdName"
+            android:text="@string/ExempelBirdName"
+            android:textSize="40sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -78,35 +78,61 @@
             android:visibility="gone"
             android:id="@+id/edit_name_button_layout">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/create_button_bird_activity"
-            android:text="@string/apply_changes"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/cancel_button_bird_activity"
-            android:text="@string/cancel"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/create_button_bird_activity"
+                android:text="@string/apply_changes"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/cancel_button_bird_activity"
+                android:text="@string/cancel"/>
         </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/latin_birdName"
-        android:textSize="30sp"
-        android:textStyle="italic"
-        android:text="@string/ExempelBirdName"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/latin_birdName"
+            android:textSize="30sp"
+            android:textStyle="italic"
+            android:text="@string/ExempelBirdName"/>
 
 
 
 
     </LinearLayout>
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/my_recycler_view"
+
+    <ImageSwitcher
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageSwitcher" />
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbars="vertical"/>
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/image_photo_name"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/prev_image_button"
+                android:background="@android:drawable/ic_media_rew" />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/next_image_button"
+                android:background="@android:drawable/ic_media_ff" />
+        </LinearLayout>
+
+    </LinearLayout>
 
 
 </LinearLayout>

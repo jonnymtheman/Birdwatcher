@@ -8,8 +8,13 @@ import android.view.Display;
 import android.widget.ImageView;
 
 /**
+ * Example class from the book
+ * Android Programming, The Big Nerd Ranch Guide - Brian Hardy, Bill Philips.
+ *
+ * This class enables
+ *
  * File:       PictureUtils.java
- * Author:     Boken
+ * Author:     Brian Hardy, Bill Phillips
  * Assignment: Inlämningsuppgift 3 - Valfri Applikation
  * Course:     Utveckling av mobila applikationer
  * Version:    1.0

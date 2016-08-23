@@ -1,30 +1,40 @@
 package com.example.jonas.birdwatcher;
 
+import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageSwitcher;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
 
 /*
-TODO fixa bugg att den tar bort fel bild
 Detta går nog inte att fixa bra för att cardviewn suger om det är >= 4 bilder.
 Öppna en lista med bara filnamnen där man kan ta bort bilder,
 en fullösning men det borde funka. Kolla buggar i BirdBank bara.
@@ -32,7 +42,7 @@ en fullösning men det borde funka. Kolla buggar i BirdBank bara.
 En till grej, om man har stängt av camera permission så kommer den inte
 att upptäcka det.
 
-Snygga till layouts och kod, kolla sen på camera permission.
+TODO kolla nullpointer om man redigerar en fågel
  */
 public class BirdActivity extends AppCompatActivity {
     private static final String TAG = "BirdActivity";
@@ -54,15 +64,15 @@ public class BirdActivity extends AppCompatActivity {
 
     private Button applyButt;
     private Button cancelButt;
-    //private ImageView birdImage;
-    //private ImageButton imageButton;
-    private RecyclerView mRecyclerView;
-    //private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private ImageSwitcher mSwitcher;
+    private Button mNextImageButton;
+    private Button mPrevImageButton;
+    private TextView mImagePhotoView;
+    private int currIndex;
+    private ArrayList<File> photoFiles;
 
     private Bird bird;
     private ArrayList<BirdPhoto> photos;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,22 +101,115 @@ public class BirdActivity extends AppCompatActivity {
         photos = new ArrayList<BirdPhoto>();
         photos = bird.getPhotos();
 
-        ArrayList<File> photoFiles = new ArrayList<File>();
+        photoFiles = new ArrayList<File>();
         for (BirdPhoto photo : photos) {
             File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).
                     getAbsolutePath(), photo.getFileName());
             photoFiles.add(f);
         }
 
+        currIndex = 0;
 
+        mSwitcher = (ImageSwitcher) findViewById(R.id.imageSwitcher);
+        mSwitcher.setFactory(new ImageSwitcher.ViewFactory() {
+            @Override
+            public View makeView() {
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        BirdCardAdapter adapter = new BirdCardAdapter(photos, photoFiles);
-        mRecyclerView.setAdapter(adapter);
+                ImageView myView = new ImageView(getApplicationContext());
+                myView.setLayoutParams(new ImageSwitcher.LayoutParams(
+                        ActionBar.LayoutParams.FILL_PARENT, ActionBar.LayoutParams.FILL_PARENT
+                ));
+
+                myView.setScaleType(ImageView.ScaleType.CENTER);
+                new AsyncTask<ImageView, Void, Bitmap>() {
+                    ImageView v;
+
+                    @Override
+                    protected Bitmap doInBackground(ImageView... imageViews) {
+                        v = imageViews[0];
+
+                        if (photoFiles.size() != 0) {
+                            Bitmap bitmap = BitmapFactory.decodeFile(photoFiles.get(currIndex).getAbsolutePath());
+                            if (bitmap != null) {
+                                int nh = (int) (bitmap.getHeight() * (1100.0 / bitmap.getWidth())); //512.0
+                                Bitmap scaled = Bitmap.createScaledBitmap(bitmap, 1100, nh, true); //512
+                                return scaled;
+                            }
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Bitmap bm) {
+                        if (bm != null) {
+                            v.setImageBitmap(bm);
+                        }
+                    }
+
+                }.execute(myView);
+                myView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (photoFiles.size() != 0) {
+                            showLargerImage(photoFiles.get(currIndex).getName());
+                        }
+                    }
+                });
+
+                return myView;
+            }
+
+        });
+
+        mImagePhotoView = (TextView) findViewById(R.id.image_photo_name);
+        if (photoFiles.size() != 0) {
+            mImagePhotoView.setText(photoFiles.get(currIndex).getName());
+        }
+
+        mNextImageButton = (Button) findViewById(R.id.next_image_button);
+        mNextImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mNextImageButton.setEnabled(false);
+                currIndex++;
+                displayNextImage(mSwitcher);
+
+            }
+        });
+
+        mPrevImageButton = (Button) findViewById(R.id.prev_image_button);
+        mPrevImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mPrevImageButton.setEnabled(false);
+                currIndex--;
+                displayNextImage(mSwitcher);
+            }
+        });
     }
 
+
+    private void displayNextImage(View v) {
+        if (currIndex > photoFiles.size()-1) {
+            currIndex = 0;
+        } else if (currIndex < 0) {
+            currIndex = photoFiles.size()-1;
+        }
+        Log.d(TAG, "Currindex: " +currIndex);
+        if (photoFiles.size() != 0) {
+            mSwitcher.setImageURI(Uri.fromFile(photoFiles.get(currIndex).getAbsoluteFile()));
+            mImagePhotoView.setText(photoFiles.get(currIndex).getName());
+        }
+        mNextImageButton.setEnabled(true);
+        mPrevImageButton.setEnabled(true);
+    }
+
+
+    private void changeImage(View v) {
+        currIndex++;
+        Bitmap bmImg = BitmapFactory.decodeFile(photoFiles.get(currIndex).getAbsolutePath());
+        mSwitcher.setImageURI(Uri.fromFile(photoFiles.get(currIndex).getAbsoluteFile()));
+    }
 
     public void showLargerImage(String photoname) {
         Intent intent = new Intent(BirdActivity.this, BirdImageActivity.class);
@@ -126,7 +229,7 @@ public class BirdActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_take_pic :
-                Log.d("LisftFragment", "Tryckte på take pic");
+                Log.d(TAG, "Tryckte på take pic");
                 PackageManager pm = getPackageManager();
                 if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
                     new AsyncTask<Integer, Void, String>() {
@@ -243,18 +346,7 @@ public class BirdActivity extends AppCompatActivity {
 
     private void showPhoto() {
 
-        //File f = getAlbumStorageDir(this.appContext, "Birds");
-     /*   File file = new File(getExternalFilesDir(
-                Environment.DIRECTORY_PICTURES), "Birds");
-        Uri uri = Uri.fromFile(file);
-        birdImage.setImageURI(uri); */
 
-     /*   BitmapDrawable b = null;
-        if (photo != null) {
-            String photoPath = getFileStreamPath(photo.getFileName()).getAbsolutePath();
-            b = PictureUtils.getScaledDrawable(this, photoPath);
-         } */
-        // birdImage.setImageDrawable(b);
     }
 
     @Override
@@ -266,25 +358,26 @@ public class BirdActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-       /* if (birdImage != null) {
-            BitmapDrawable b = (BitmapDrawable)birdImage.getDrawable();
-            if (b.getBitmap() != null) {
-                b.getBitmap().recycle();
-            }
-            birdImage.setImageDrawable(null); */
-        // }
     }
+
+    //TODO den landar i här inne, kanske updatera photoFiles då.
+    //Annars kolla på om man ska skicka tillbaka ett intent
+    //Förutom det finns en bugg när man redigerar fågeln
+    //Annars allt klart och gör layout-land
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d("POPO", "Requestcode:"+requestCode);
         if (resultCode != Activity.RESULT_OK) {
+            Log.d(TAG, "Här inne");
             return;
         } else if (requestCode == REQUEST_PHOTO) {
+                Log.d(TAG, "Efter kollen");
             // create a new Photo object and attach it to the crime
             String filename = data
                     .getStringExtra(BirdCameraFragment.EXTRA_PHOTO_FILENAME);
             if (filename != null) {
+                Log.d(TAG, "Fick tillbaka: "+filename);
                 BirdPhoto photo = new BirdPhoto(filename);
                 ArrayList<BirdPhoto> photos = new ArrayList<BirdPhoto>();
                 photos.add(photo);
@@ -294,6 +387,10 @@ public class BirdActivity extends AppCompatActivity {
                 //mCrime.setPhoto(p);
                 showPhoto();
                 Log.d(TAG, filename);
+                File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).
+                        getAbsolutePath(), photo.getFileName());
+                photoFiles.add(f);
+                displayNextImage(mSwitcher);
                 //BirdBank.get(this).storeBirds();
             }
         }

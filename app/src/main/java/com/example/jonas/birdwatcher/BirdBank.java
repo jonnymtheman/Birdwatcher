@@ -20,9 +20,14 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * Ska hålla alla birds, kan vid uppstard ladda in alla fåglar
+ * BirdBank enables the application to access the birds.
+ * It is responsible for loading and storing Bird objects
+ * and Photos taken by the application.
  *
- * File:       ${FILE_NAME}.java
+ * This class has been inspired by the class CrimeLab from the book
+ * Android Programming, The Big Nerd Ranch Guide - Brian Hardy, Bill Philips.
+ *
+ * File:       BirdBank.java
  * Author:     Jonas Nyman
  * Assignment: Inlämningsuppgift 3 - Valfri Applikation
  * Course:     Utveckling av mobila applikationer
@@ -38,23 +43,17 @@ public class BirdBank {
     private static BirdBank sBirdBank;
 
     public BirdBank(Context appContext) {
+
         this.appContext = appContext;
-
         birds = new ArrayList<Bird>();
-
-     /*   for (int i = 0; i < 10; i++) {
-            Bird bird = new Bird("Name"+i, i);
-            BirdPhoto photo = new BirdPhoto("Photo"+i+".jpg");
-            ArrayList<BirdPhoto> photos = new ArrayList<BirdPhoto>();
-            photos.add(photo);
-            bird.setPhotos(photos);
-            birds.add(bird);
-
-        } */
     }
 
-
-
+    /**
+     * Creates, if neccessary, an instance of BirdBank.
+     *
+     * @param context Activity Context
+     * @return instance of BirdBank
+     */
     public static BirdBank get(Context context) {
         if (sBirdBank == null) {
             sBirdBank = new BirdBank(context.getApplicationContext());
@@ -77,21 +76,6 @@ public class BirdBank {
         }
     }
 
-
-
-
-    /*
-
-     public void updateBird(Bird oldBird, String name, String latinName) {
-        for (Bird bird : birds) {
-            if (bird.getmId() == oldBird.getmId()) {
-                deleteBirdInfo(oldBird);
-                storeBirdInfo(bird);
-            }
-        }
-    }
-     */
-
     public Bird getBird(int id) {
         for (Bird bird : birds) {
             if (bird.getmId() == id) {
@@ -102,13 +86,21 @@ public class BirdBank {
     }
 
 
-
-    /*
-       Store a photo on external memory.
-
+    /**
+     * Stores a photo taken by the application on the external Memory Card.
+     * Location of storage is the Pictures folder.
+     *
+     * After the picture is stored, it is added to the current Bird.
+     *
+     * @param data Byte array of picture.
+     * @param birdId Id of bird associated with the picture.
      */
     public void storeBirdPhoto(byte[] data, int birdId) {
-        if (isExternalStorageWritable()) {
+
+        //Check permission to write data to memory card.
+        if (Environment.MEDIA_MOUNTED.
+                equals(Environment.getExternalStorageState())) {
+
             Bird bird = getBird(birdId);
             Date date = new Date();
             SimpleDateFormat dateFormat =
@@ -119,8 +111,7 @@ public class BirdBank {
             String newFileName = "Photo"+bird.getmId()
                                         +bird.getPhotos().size()+dateStr+".jpg";
 
-            //File f = getAlbumStorageDir(this.appContext, "Birds");
-            //File file = new File(f, newFileName);
+            //Get file from the Pictures directory
             File path = Environment.getExternalStoragePublicDirectory(
                     Environment.DIRECTORY_PICTURES);
             File file = new File(path, newFileName);
@@ -132,31 +123,31 @@ public class BirdBank {
                     out.write(data);
                     out.close();
 
-                   /* MediaScannerConnection.scanFile(this,
-                            new String[] { file.toString() }, null,
-                            new MediaScannerConnection.OnScanCompletedListener() {
-                                public void onScanCompleted(String path, Uri uri) {
-                                    Log.i("ExternalStorage", "Scanned " + path + ":");
-                                    Log.i("ExternalStorage", "-> uri=" + uri);
-                                }
-                            }); */
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
            // }
-            bird.addPhoto(new BirdPhoto(newFileName)); //Kanske måste spara mer än namnet för när man ska hämta
+            bird.addPhoto(new BirdPhoto(newFileName));
             storeBirdInfo(bird);
+            Log.d(TAG, "Sparade: "+newFileName);
         }
 
     }
 
+    /**
+     * Deletes a picture of a bird stored in the Pictures directory.
+     *
+     * @param photoName Name of picture to be deleted
+     */
     public void deleteBirdPhoto(String photoName) {
         File path = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES);
+
         File file = new File(path, photoName);
         Boolean deleted = file.delete();
+
         if (deleted) {
             Log.d(TAG, "Deleted: "+photoName);
             for (Bird bird : birds) {
@@ -167,11 +158,18 @@ public class BirdBank {
                 }
             }
         } else {
+            //TODO toast
             Log.d(TAG, "Not deleted: "+photoName);
         }
 
     }
 
+    /**
+     * Removes a photo from a Bird's photo list.
+     *
+     * @param photoName Name of BirdPhoto.
+     * @param bird Bird to remove the BirdPhoto from.
+     */
     private void removePhotoFromBird(String photoName, Bird bird) {
         ArrayList<BirdPhoto> tmp = bird.getPhotos();
         if (tmp != null) {
@@ -187,39 +185,34 @@ public class BirdBank {
         }
     }
 
-    //När appen startas. Tänk på filnamnen, kanske behöver lägga till
+    /**
+     * Loads bird info from the internal memory.
+     * Reads the file using a BufferedReader and creates
+     * Bird objects which are added to the arraylist of Bird's.
+     */
     public void loadBirds() {
-        String str[] = this.appContext.fileList();
-        for (String s : str) {
+        String fileList[] = this.appContext.fileList();
+        for (String s : fileList) {
             if (s.startsWith("Bird:")) {
-                FileInputStream in = null;
+                FileInputStream inputStream = null;
                 try{
-                    in = appContext.openFileInput(s);
-                    //byte[] buffer = new byte[1024];
-                    String str1 ="";
-                    int re;
-                    BufferedReader red = new BufferedReader(new InputStreamReader(in));
+                    inputStream = appContext.openFileInput(s);
+                    String inputString ="";
+                    BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(inputStream));
 
-
-
-
-                    StringBuilder sb =  new StringBuilder();
-                    while ((str1 = red.readLine()) != null) {
-                        sb.append(str1);
-                        // do something with your read line
+                    StringBuilder stringBuilder =  new StringBuilder();
+                    while ((inputString = reader.readLine()) != null) {
+                        stringBuilder.append(inputString);
                     }
-                    str1 = sb.toString();
-                    red.close();
-                   // while ((re = in.read()) != -1) {
-                   //     str1 += (char)re;
-                   // }
-                   // in.close();
-                    //Näst nästa uppgift: Kolla om det finns lagrat birds, om inte returnera!
-                    //Ta ut och skapa en bird
-                    ArrayList<String> nameId = extractBirdName(str1);
-                    Bird bird = new Bird(nameId.get(0),nameId.get(1) ,Integer.parseInt(nameId.get(2)));
-                   // bird.setLatinName(nameId.get(2));
-                   ArrayList<String> photos = getPhotoNames(str1);
+                    inputString = stringBuilder.toString();
+                    reader.close();
+
+                    //Create a Bird object
+                    ArrayList<String> birdContent = extractBirdName(inputString);
+                    Bird bird = new Bird(birdContent.get(0),birdContent.get(1),
+                            Integer.parseInt(birdContent.get(2)));
+                    ArrayList<String> photos = getPhotoNames(inputString);
                     if (photos != null) {
                         ArrayList<BirdPhoto> birdPhotos = new ArrayList<BirdPhoto>();
                         for (String photoStr : photos) {
@@ -228,27 +221,32 @@ public class BirdBank {
                         bird.setPhotos(birdPhotos);
                     }
                     birds.add(bird);
-                  //  File f = getAlbumStorageDir(this.appContext, "Birds");
-                  //  File[] files = f.listFiles();
-                  //  int i = 1;
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
+                    //TODO toast
                     e.printStackTrace();
                 }
             }
         }
     }
 
+    /**
+     * Extracts the bird content of a string from Bird.toString().
+     * The format of the string is "Name,Latin name,id".
+     *
+     * @param str String from Bird.toString()
+     * @return Arraylist of Name, Latin name and id.
+     */
     private ArrayList<String> extractBirdName(String str) {
-        ArrayList<String> nameId = new ArrayList<String>();
+        ArrayList<String> birdContent = new ArrayList<String>();
         String[] tmp = str.split(",");
-        nameId.add(tmp[0]);
-        nameId.add(tmp[1]);
-        nameId.add(tmp[2]);
+        birdContent.add(tmp[0]);
+        birdContent.add(tmp[1]);
+        birdContent.add(tmp[2]);
 
-        return nameId;
+        return birdContent;
     }
 
     private ArrayList<String> getPhotoNames(String string) {
@@ -266,19 +264,23 @@ public class BirdBank {
         return photoNames;
     }
 
-    // Ska spara infon om fåglarna på internal storage
+    /**
+     * Stores a Bird object on the applications internal memory as a file.
+     * The filename is "Bird:" followed by the Bird's name and the content
+     * of the file is the result of the Bird's toString(), which returns
+     * a string containing information about the bird and its photo names.
+     *
+     * @param bird Bird object to store on the internal memory,
+     */
     public void storeBirdInfo(Bird bird) {
-        Log.d(TAG, "inne i storebirdInfo");
         String filename = "Bird:"+bird.getName();
         FileOutputStream os = null;
-        String te = bird.toString();
         try {
             os = this.appContext.openFileOutput(filename, Context.MODE_PRIVATE);
-            //Writer writer = new OutputStreamWriter(os, Charset.forName("UTF-8"));
-            //writer.write(bird.toString());
             os.write(bird.toString().getBytes());
         } catch (Exception e) {
             Log.e(TAG, "Error writing to file " + filename, e);
+            //TODO Toast
         } finally {
             try {
                 if (os != null)
@@ -290,8 +292,6 @@ public class BirdBank {
         if (!isBirdAdded(bird)) {
             birds.add(bird);
         }
-
-        int k = 2;
     }
 
     public void deleteBirdInfo(Bird bird) {
@@ -300,7 +300,7 @@ public class BirdBank {
         int count = 0;
         for (Bird b : birds) {
             if (b.getmId() == bird.getmId()) {
-                if (b.getName() == bird.getName()) {
+                if (b.getName().equals(bird.getName())) {
                     birds.remove(count);
                     break;
                 }
@@ -319,25 +319,5 @@ public class BirdBank {
         return false;
     }
 
-    public File getAlbumStorageDir(Context context, String albumName) {
-        // Get the directory for the app's private pictures directory.
-        File file = new File(context.getExternalFilesDir(
-                Environment.DIRECTORY_PICTURES), albumName);
-        Log.d("TAG", "Sparat: "+ file.getAbsolutePath());
-        if (!file.mkdirs()) {
-            Log.e("LOG_TAG", "Directory not created");
-        }
-        return file;
-    }
-
-    private boolean isExternalStorageWritable() {
-
-        String avaiable = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(avaiable)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 
 }

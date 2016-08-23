@@ -1,18 +1,19 @@
 package com.example.jonas.birdwatcher;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 
 import java.io.File;
 
 /**
- * File:       ${FILE_NAME}.java
+ * Displays a larger Image in an imageView.
+ * In order to scale the picture, the class PictureUtils
+ * have been used.
+ *
+ * File:       BirdImageActivity.java
  * Author:     Jonas Nyman
  * Assignment: Inlämningsuppgift 3 - Valfri Applikation
  * Course:     Utveckling av mobila applikationer
@@ -32,9 +33,6 @@ public class BirdImageActivity extends AppCompatActivity{
         File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).
                 getAbsolutePath(), fileName);
         BitmapDrawable md = PictureUtils.getScaledDrawable(this, f.getPath());
-        //Bitmap bitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
         imageView.setImageDrawable(md);
-
-
     }
 }

@@ -1,12 +1,9 @@
 package com.example.jonas.birdwatcher;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import java.util.ArrayList;
-
 /**
- * Hold a photo of a bird
+ * Represents a photo of a Bird by holding the file name
+ * of a saved image.
+ *
  * File:       BirdPhoto.java
  * Author:     Jonas Nyman
  * Assignment: Inlämningsuppgift 3 - Valfri Applikation
@@ -16,7 +13,6 @@ import java.util.ArrayList;
 public class BirdPhoto  {
 
     private String fileName;
-
 
     public BirdPhoto(String fileName) {
 

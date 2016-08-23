@@ -2,6 +2,7 @@ package com.example.jonas.birdwatcher;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -42,6 +43,7 @@ public class BirdCardAdapter extends RecyclerView.Adapter<BirdCardAdapter.MyView
 
         private ImageView imageView;
 
+        private holdValues values;
         public MyViewHolder(View view) {
             super(view);
             mView = view;
@@ -50,10 +52,11 @@ public class BirdCardAdapter extends RecyclerView.Adapter<BirdCardAdapter.MyView
                 public void onClick(View view) {
                     //Intent intent = new Intent(view.getContext(), BirdActivity.class);
                     //intent.putExtra("Disp", "Dips");
-                    ((BirdActivity)view.getContext()).showLargerImage(photoName);
+                    ((BirdActivity)view.getContext()).showLargerImage(photos.get(getAdapterPosition()).getFileName());
                 }
             });
             photoName = "";
+            values = new holdValues();
 
             imageView = (ImageView) view.findViewById(R.id.bird_card_imageView);
             deleteButton = (Button) view.findViewById(R.id.delete_card_button);
@@ -70,7 +73,7 @@ public class BirdCardAdapter extends RecyclerView.Adapter<BirdCardAdapter.MyView
                             Log.d("TAG", "Clicked ok in dialog");
                             int count = 0;
                             for (BirdPhoto photo1 : photos) {
-                                if (photo1.getFileName().equals(photoName)) {
+                                if (photo1.getFileName().equals(photos.get(getAdapterPosition()).getFileName())) {
                                     photos.remove(count);
                                     break;
                                 }
@@ -119,20 +122,25 @@ public class BirdCardAdapter extends RecyclerView.Adapter<BirdCardAdapter.MyView
     private void displayToast() {
         Toast.makeText(mView.getContext(), "Unable to read storage", Toast.LENGTH_SHORT).show();
     }
+
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         BirdPhoto photo = photos.get(position);
         photoName = photo.getFileName();
+        holder.values.pos = position;
 
-        new AsyncTask<RecyclerView.ViewHolder, Void, Bitmap>() {
+        new AsyncTask<Integer, Void, Bitmap>() {
+            private int imgPos;
 
             @Override
-            protected Bitmap doInBackground(RecyclerView.ViewHolder... viewHolders) {
+            protected Bitmap doInBackground(Integer... pos) {
                 Bitmap bitmap = null;
                 Bitmap scaled = null;
+                imgPos = pos[0];
+                Log.d(TAG, "Imgpos: " +imgPos +" ,AdapterPos: "+holder.getAdapterPosition());
 
                 File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).
-                        getAbsolutePath(), photoName);
+                        getAbsolutePath(), photos.get(holder.getAdapterPosition()).getFileName());
                 if (f.isFile()) {
                     bitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
                     if (bitmap != null) {
@@ -148,10 +156,13 @@ public class BirdCardAdapter extends RecyclerView.Adapter<BirdCardAdapter.MyView
             @Override
             protected void onPostExecute(Bitmap bm) {
                 if (bm != null) {
-                    holder.imageView.setImageBitmap(bm);
+                    if (imgPos == holder.getAdapterPosition()) {
+                        holder.imageView.setImageBitmap(bm);
+                    }
+
                 }
             }
-        }.execute(holder);
+        }.execute(position);
 
         if (isFail) {
             displayToast();
@@ -192,6 +203,10 @@ public class BirdCardAdapter extends RecyclerView.Adapter<BirdCardAdapter.MyView
                 Log.d(TAG, "Inne i onPost");
                // imageView.setImageBitmap(f);
         }
+    }
+
+    private static class holdValues {
+        public int pos;
     }
 
 }
