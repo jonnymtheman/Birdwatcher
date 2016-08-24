@@ -11,8 +11,8 @@ import java.io.File;
 
 /**
  * Displays a larger Image in an imageView.
- * The image is scaled up to a larger size before
- * being displayed.
+ * The image is scaled up to a larger size in the
+ * layout activity_bird_image.xml.
  *
  * File:       BirdImageActivity.java
  * Author:     Jonas Nyman
@@ -20,9 +20,10 @@ import java.io.File;
  * Course:     Utveckling av mobila applikationer
  * Version:    1.0
  */
-public class BirdImageActivity extends AppCompatActivity{
+public class BirdImageActivity extends AppCompatActivity {
 
     private ImageView imageView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,12 +37,8 @@ public class BirdImageActivity extends AppCompatActivity{
                 Environment.DIRECTORY_PICTURES).getAbsolutePath(), fileName);
         Bitmap bitmap = BitmapFactory.decodeFile(
                 f.getAbsolutePath());
-        int imageSize = (int) (bitmap.getHeight()
-                * (2200.0 / bitmap.getWidth()));
-        Bitmap scaledImage = Bitmap.createScaledBitmap(bitmap,
-                2200, imageSize, true);
-        if (scaledImage != null) {
-            imageView.setImageBitmap(scaledImage);
+        if (bitmap != null) {
+            imageView.setImageBitmap(bitmap);
         }
     }
 }

@@ -82,7 +82,6 @@ public class BirdBank {
         //Check permission to write data to memory card.
         if (Environment.MEDIA_MOUNTED.
                 equals(Environment.getExternalStorageState())) {
-
             Bird bird = getBird(birdId);
             Date date = new Date();
             SimpleDateFormat dateFormat =

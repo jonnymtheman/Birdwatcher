@@ -26,7 +26,6 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.ArrayList;
 
-
 /**
  * BirdActivity is the activity that displays information
  * about a bird. The bird's photos are displayed in an
@@ -308,7 +307,7 @@ public class BirdActivity extends AppCompatActivity {
                             startActivityForResult(intent, integers[0]);
                             return null;
                         }
-                    }.execute(REQUEST_PHOTO);
+                    }.execute(1);
 
                 }
                 return true;
@@ -420,7 +419,7 @@ public class BirdActivity extends AppCompatActivity {
 
     /**
      * Retrieve the photo taken by the camera activity.
-     * TODO kolla om size blir bättre när man ska se hela bilden
+     *
      * @param requestCode Request code.
      * @param resultCode Result code.
      * @param data Intent containing the filename with key "Filename".

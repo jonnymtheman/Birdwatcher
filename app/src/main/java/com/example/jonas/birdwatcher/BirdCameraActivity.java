@@ -5,16 +5,31 @@ import android.hardware.Camera;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * BirdCameraActivity takes a picture and stores the
+ * picture taken on the external memory card using the
+ * BirdBank. The filename of the picture taken is sent
+ * to BirdActivity using an intent.
+ *
+ * This class uses an algorithm from the book
+ * Android Programming, The Big Nerd Ranch Guide - Brian Hardy, Bill Philips
+ * to get the largest available size of the picture. This algorithm
+ * is implemented in the method getBestSupportedSize().
+ *
+ * File:       BirdCameraActivity.java
+ * Author:     Jonas Nyman
+ * Assignment: Inlämningsuppgift 3 - Valfri Applikation
+ * Course:     Utveckling av mobila applikationer
+ * Version:    1.0
+ */
 public class BirdCameraActivity extends AppCompatActivity {
 
     private static final String TAG = "BirdCameraActivity";
@@ -24,111 +39,127 @@ public class BirdCameraActivity extends AppCompatActivity {
 
     private Camera mCamera;
     private SurfaceView mSurfaceView;
-    private SurfaceHolder mSurfaceHolder;
-    private View mProgressContainer;
-
     SurfaceHolder surfaceHolder;
 
     Camera.Size size;
-    Camera.PictureCallback rawCallback;
     Camera.ShutterCallback shutterCallback;
-    Camera.PictureCallback jpegCallback;
-
+    Camera.PictureCallback pictureCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bird_camera);
         getSupportActionBar().hide();
+
         birdName = getIntent().getStringExtra("BIRD_NAME");
         birdID = getIntent().getIntExtra("BIRD_ID",0);
         birdPhotoID = getIntent().getIntExtra("PHOTO_ID", 0);
 
-        mProgressContainer = findViewById(R.id.mbird_camera_progressContainer);
-        mProgressContainer.setVisibility(View.INVISIBLE);
+        shutterCallback = new Camera.ShutterCallback() {
+            @Override
+            public void onShutter() {
+                // Plays the picture taken sound
+            }
+        };
 
         mSurfaceView = (SurfaceView) findViewById(R.id.mbird_camera_surfaceView);
         surfaceHolder = mSurfaceView.getHolder();
+        // Click on the preview image to take a picture
         mSurfaceView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "Taped to take picture", Toast.LENGTH_SHORT).show();
                 if (mCamera != null) {
-                    mCamera.takePicture(shutterCallback, null, jpegCallback);
+                    mCamera.takePicture(shutterCallback, null, pictureCallback);
                 }
             }
         });
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         surfaceHolder.addCallback(new SurfaceHolder.Callback() {
 
+            // Create a preview showing the camera
             public void surfaceCreated(SurfaceHolder holder) {
-
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
                     mCamera = Camera.open(0);
                 } else {
                     mCamera = Camera.open();
                 }
-                // tell the camera to use this surface as its preview area
                 try {
                     if (mCamera != null) {
                         mCamera.setPreviewDisplay(holder);
                         mCamera.startPreview();
                     }
                 } catch (IOException exception) {
-                    Log.e(TAG, "Error setting up preview display", exception);
+                    // Stop activity if preview fails
+                    Toast.makeText(getApplicationContext(), "Failed to open camera",
+                            Toast.LENGTH_SHORT).show();
+                    finish();
                 }
             }
 
+            /**
+             * Stops the preview and releases the camera.
+             *
+             * @param holder SurfaceHolder
+             */
             public void surfaceDestroyed(SurfaceHolder holder) {
-                // we can no longer display on this surface, so stop the preview.
                 if (mCamera != null) {
                     mCamera.stopPreview();
                     mCamera.release();
                 }
             }
 
-            public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+            /**
+             * Calculate the camera's parameters using the algorithm in
+             * getBestSupportedSize() and preview the camera.
+             *
+             * @param holder SurfaceHolder
+             * @param format Format
+             * @param width width
+             * @param height height
+             */
+            public void surfaceChanged(SurfaceHolder holder, int format,
+                                       int width, int height) {
                 if (mCamera == null) return;
 
-                // the surface has changed size; update the camera preview size
                 Camera.Parameters parameters = mCamera.getParameters();
-                size = getBestSupportedSize(parameters.getSupportedPreviewSizes(), w, h);
+                size = getBestSupportedSize(parameters.getSupportedPreviewSizes(),
+                        width, height);
                 parameters.setPreviewSize(size.width, size.height);
-                size = getBestSupportedSize(parameters.getSupportedPictureSizes(), w, h);
+                size = getBestSupportedSize(parameters.getSupportedPictureSizes(),
+                        width, height);
                 parameters.setPictureSize(size.width, size.height);
                 mCamera.setParameters(parameters);
                 try {
                     mCamera.startPreview();
                 } catch (Exception e) {
-                    Log.e(TAG, "Could not start preview", e);
                     mCamera.release();
                     mCamera = null;
                 }
             }
         });
 
-        jpegCallback = new Camera.PictureCallback() {
+        pictureCallback = new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] data, Camera camera) {
-                String filename = birdID + birdPhotoID +".jpg";
-                Log.d(TAG, "FileName: "+filename);
                 String tmp = "";
+
                 //Store the image in the BirdBank.
                 tmp = BirdBank.get(getApplicationContext()).storeBirdPhoto(data, birdID);
 
                 Intent intent = new Intent();
                 intent.putExtra("Filename", tmp);
-                intent.putExtra("Height", size.height);
-                intent.putExtra("Width", size.width);
                 setResult(1, intent);
                 finish();
             }
         };
     }
 
-    /** a simple algorithm to get the largest size available. For a more
+    /**
+     * Algorithm from the book
+     * Android Programming, The Big Nerd Ranch Guide - Brian Hardy, Bill Philips
+     * that retrieves the largest picture size available.
      * robust version, see CameraPreview.java in the ApiDemos
-     * sample app from Android. */
+     */
     private Camera.Size getBestSupportedSize(List<Camera.Size> sizes, int width, int height) {
         Camera.Size bestSize = sizes.get(0);
         int largestArea = bestSize.width * bestSize.height;
@@ -141,4 +172,5 @@ public class BirdCameraActivity extends AppCompatActivity {
         }
         return bestSize;
     }
+
 }
