@@ -35,6 +35,7 @@ public class BirdCameraFragment extends Fragment {
     private View mProgressContainer;
 
 
+
     private Camera.ShutterCallback mShutterCallback = new Camera.ShutterCallback() {
         public void onShutter() {
             // display the progress indicator
@@ -46,9 +47,11 @@ public class BirdCameraFragment extends Fragment {
             // create a filename
             String filename = birdID + birdPhotoID +".jpg"; //UUID.randomUUID().toString() + ".jpg";
             Log.d(TAG, "FileName: "+filename);
-
-            BirdBank.get(getActivity()).storeBirdPhoto(data, birdID);
-
+            String tmp = "";
+            tmp = BirdBank.get(getActivity()).storeBirdPhoto(data, birdID);
+            Intent intent = new Intent();
+            intent.putExtra("Filename", tmp);
+            getActivity().setResult(1, intent);
             getActivity().finish();
         }
     };

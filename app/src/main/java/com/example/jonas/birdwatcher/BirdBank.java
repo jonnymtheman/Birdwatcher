@@ -95,8 +95,8 @@ public class BirdBank {
      * @param data Byte array of picture.
      * @param birdId Id of bird associated with the picture.
      */
-    public void storeBirdPhoto(byte[] data, int birdId) {
-
+    public String storeBirdPhoto(byte[] data, int birdId) {
+        String retStr = "";
         //Check permission to write data to memory card.
         if (Environment.MEDIA_MOUNTED.
                 equals(Environment.getExternalStorageState())) {
@@ -132,8 +132,11 @@ public class BirdBank {
             bird.addPhoto(new BirdPhoto(newFileName));
             storeBirdInfo(bird);
             Log.d(TAG, "Sparade: "+newFileName);
+
+            return retStr +=newFileName;
         }
 
+        return  retStr;
     }
 
     /**

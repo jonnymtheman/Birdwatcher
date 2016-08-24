@@ -331,14 +331,12 @@ public class BirdActivity extends AppCompatActivity {
 
     private void applyChanges(String name, String latinName) {
         Bird newBird = new Bird(name, latinName, bird.getmId());
+        newBird.setPhotos(bird.getPhotos());
         BirdBank.get(this).deleteBirdInfo(bird);
         ArrayList<Bird> bird1 = BirdBank.get(this).getBirds();
         BirdBank.get(this).storeBirdInfo(newBird);
         ArrayList<Bird> bird2 = BirdBank.get(this).getBirds();
         bird = newBird;
-        bird.setName(name);
-        bird.setLatinName(latinName);
-        //BirdBank.get(this).updateBird(bird, name, latinName);
 
         nameView.setText(bird.getName());
         latinNameView.setText(bird.getLatinName());
@@ -360,8 +358,6 @@ public class BirdActivity extends AppCompatActivity {
         super.onStop();
     }
 
-    //TODO den landar i här inne, kanske updatera photoFiles då.
-    //Annars kolla på om man ska skicka tillbaka ett intent
     //Förutom det finns en bugg när man redigerar fågeln
     //Annars allt klart och gör layout-land
 
@@ -370,6 +366,16 @@ public class BirdActivity extends AppCompatActivity {
         Log.d("POPO", "Requestcode:"+requestCode);
         if (resultCode != Activity.RESULT_OK) {
             Log.d(TAG, "Här inne");
+            String filename = data
+                    .getStringExtra("Filename");
+            if (filename != null) {
+                bird = BirdBank.get(this).getBird(bird.getmId());
+                File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).
+                        getAbsolutePath(), filename);
+                photoFiles.add(f);
+                currIndex = photoFiles.size()-1;
+                displayNextImage(mSwitcher);
+            }
             return;
         } else if (requestCode == REQUEST_PHOTO) {
                 Log.d(TAG, "Efter kollen");
