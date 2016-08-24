@@ -63,6 +63,7 @@ public class BirdCameraActivity extends AppCompatActivity {
         };
 
         mSurfaceView = (SurfaceView) findViewById(R.id.mbird_camera_surfaceView);
+        assert mSurfaceView != null;
         surfaceHolder = mSurfaceView.getHolder();
         // Click on the preview image to take a picture
         mSurfaceView.setOnClickListener(new View.OnClickListener() {

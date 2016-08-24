@@ -252,8 +252,15 @@ public class BirdActivity extends AppCompatActivity {
             currIndex = photoFiles.size()-1;
         }
         if (photoFiles.size() != 0) {
-            mSwitcher.setImageURI(Uri.fromFile(photoFiles.get(currIndex).getAbsoluteFile()));
-            mImagePhotoView.setText(photoFiles.get(currIndex).getName());
+            if (photoFiles.get(currIndex).exists()) {
+                mSwitcher.setImageURI(Uri.fromFile(photoFiles.get(currIndex).
+                        getAbsoluteFile()));
+                mImagePhotoView.setText(photoFiles.get(currIndex).getName());
+            } else {
+                mSwitcher.setImageDrawable(null);
+                mImagePhotoView.setText(R.string.unable_load_image);
+            }
+
         }
         mNextImageButton.setEnabled(true);
         mPrevImageButton.setEnabled(true);
@@ -299,7 +306,6 @@ public class BirdActivity extends AppCompatActivity {
                     new AsyncTask<Integer, Void, String>() {
                         @Override
                         protected String doInBackground(Integer... integers) {
-                            //Intent intent = new Intent(BirdActivity.this, CameraActivity.class);
                             Intent intent = new Intent(BirdActivity.this, BirdCameraActivity.class);
                             intent.putExtra(BIRD_NAME, bird.getName());
                             intent.putExtra(BIRD_ID, bird.getmId());
@@ -308,7 +314,6 @@ public class BirdActivity extends AppCompatActivity {
                             return null;
                         }
                     }.execute(1);
-
                 }
                 return true;
 
