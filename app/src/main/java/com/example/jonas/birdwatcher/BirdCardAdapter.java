@@ -79,7 +79,7 @@ public class BirdCardAdapter extends RecyclerView.Adapter<BirdCardAdapter.MyView
                                 }
                                 count++;
                             }
-                            BirdBank.get(view.getContext()).deleteBirdPhoto(photoName);
+                            //BirdBank.get(view.getContext()).deleteBirdPhoto(photoName, );
 
 
                             //updatePhotoList();

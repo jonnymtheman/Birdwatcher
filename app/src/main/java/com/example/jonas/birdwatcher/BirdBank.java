@@ -1,9 +1,9 @@
 package com.example.jonas.birdwatcher;
 
 import android.content.Context;
-import android.media.MediaScannerConnection;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,9 +12,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,11 +36,9 @@ public class BirdBank {
     private final Context appContext;
 
     private ArrayList<Bird> birds;
-
     private static BirdBank sBirdBank;
 
     public BirdBank(Context appContext) {
-
         this.appContext = appContext;
         birds = new ArrayList<Bird>();
     }
@@ -65,17 +60,6 @@ public class BirdBank {
         return birds;
     }
 
-    public void updateBird(Bird bird) {
-        for (Bird b : birds) {
-            if (b.getmId() == bird.getmId()) {
-                b.setPhotos(bird.getPhotos());
-                b.setName(bird.getName());
-                b.setLatinName(bird.getLatinName());
-                storeBirdInfo(b);
-            }
-        }
-    }
-
     public Bird getBird(int id) {
         for (Bird bird : birds) {
             if (bird.getmId() == id) {
@@ -84,7 +68,6 @@ public class BirdBank {
         }
         return null;
     }
-
 
     /**
      * Stores a photo taken by the application on the external Memory Card.
@@ -116,19 +99,16 @@ public class BirdBank {
                     Environment.DIRECTORY_PICTURES);
             File file = new File(path, newFileName);
 
-           // if (file.exists()) {
                 try {
                     path.mkdirs();
                     FileOutputStream out = new FileOutputStream(file);
                     out.write(data);
                     out.close();
 
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
+                    displayToast();
                 }
-           // }
             bird.addPhoto(new BirdPhoto(newFileName));
             storeBirdInfo(bird);
             Log.d(TAG, "Sparade: "+newFileName);
@@ -144,27 +124,37 @@ public class BirdBank {
      *
      * @param photoName Name of picture to be deleted
      */
-    public void deleteBirdPhoto(String photoName) {
+    public void deleteBirdPhoto(String photoName, Bird bird) {
         File path = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES);
 
-        File file = new File(path, photoName);
-        Boolean deleted = file.delete();
+        int count = 0;
+        boolean deletePhoto = false;
+        boolean deleted = false;
+        for (BirdPhoto photo : bird.getPhotos()) {
+            if (photo.getFileName().equals(photoName)) {
+                deletePhoto = true;
+                break;
+            }
+            count++;
+        }
+        if (deletePhoto) {
+            ArrayList<BirdPhoto> tmp = bird.getPhotos();
+            tmp.remove(count);
+            Bird tmpBird = bird;
+            deleteBirdInfo(bird);
+            tmpBird.setPhotos(tmp);
+            storeBirdInfo(tmpBird);
+            File file = new File(path, photoName);
+            deleted = file.delete();
+        }
 
         if (deleted) {
             Log.d(TAG, "Deleted: "+photoName);
-            for (Bird bird : birds) {
-                for (BirdPhoto photo : bird.getPhotos()) {
-                    if (photo.getFileName().equals(photoName)) {
-                        removePhotoFromBird(photoName, bird);
-                    }
-                }
-            }
         } else {
-            //TODO toast
             Log.d(TAG, "Not deleted: "+photoName);
+            displayToast();
         }
-
     }
 
     /**
@@ -225,11 +215,9 @@ public class BirdBank {
                     }
                     birds.add(bird);
 
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
                 } catch (IOException e) {
-                    //TODO toast
                     e.printStackTrace();
+                    displayToast();
                 }
             }
         }
@@ -283,13 +271,14 @@ public class BirdBank {
             os.write(bird.toString().getBytes());
         } catch (Exception e) {
             Log.e(TAG, "Error writing to file " + filename, e);
-            //TODO Toast
+            displayToast();
         } finally {
             try {
                 if (os != null)
                     os.close();
             } catch (Exception e) {
                 Log.e(TAG, "Error closing file " + filename, e);
+                displayToast();
             }
         }
         if (!isBirdAdded(bird)) {
@@ -297,8 +286,22 @@ public class BirdBank {
         }
     }
 
+    private void displayToast() {
+        Toast.makeText(appContext, "Unable access storage",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Delete a bird from the internal application's memory.
+     *
+     * The bird is removed from the bank's internal list of birds
+     * and then removed from the application's internal memory.
+     * Any pictures associated with the bird is left to the user
+     * to handle.
+     *
+     * @param bird Bird to be removed.
+     */
     public void deleteBirdInfo(Bird bird) {
-        Log.d(TAG, "inne i deletebirdInfo");
         String filename = "Bird:"+bird.getName();
         int count = 0;
         for (Bird b : birds) {
@@ -313,6 +316,13 @@ public class BirdBank {
         this.appContext.deleteFile(filename);
     }
 
+    /**
+     * Check if a Bird already exists in the bank's internal
+     * list of Birds.
+     *
+     * @param bird Bird to check if it exists in the bank.
+     * @return Boolean if the Bird exists.
+     */
     private boolean isBirdAdded(Bird bird) {
         for (Bird b : birds) {
             if (b.getmId() == bird.getmId()) {

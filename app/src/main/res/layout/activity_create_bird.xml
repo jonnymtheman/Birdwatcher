@@ -53,12 +53,12 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/new_bird_okButton"
-            android:text="@string/create_bird"/>
+            android:id="@+id/cancel_create_bird"
+            android:text="@string/cancel"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/cancel_create_bird"
-            android:text="@string/cancel"/>
+            android:id="@+id/new_bird_okButton"
+            android:text="@string/create_bird"/>
     </LinearLayout>
 </LinearLayout>

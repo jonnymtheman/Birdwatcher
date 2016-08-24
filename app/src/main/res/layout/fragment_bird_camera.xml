@@ -25,9 +25,6 @@
                 android:text="@string/take"
                 android:id="@+id/bird_camera_takePicture" />
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
         </LinearLayout>
 
 

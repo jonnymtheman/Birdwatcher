@@ -1,9 +1,7 @@
 package com.example.jonas.birdwatcher;
 
-import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,38 +9,36 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
-
 import java.io.File;
 import java.util.ArrayList;
 
-/*
-Detta går nog inte att fixa bra för att cardviewn suger om det är >= 4 bilder.
-Öppna en lista med bara filnamnen där man kan ta bort bilder,
-en fullösning men det borde funka. Kolla buggar i BirdBank bara.
 
-En till grej, om man har stängt av camera permission så kommer den inte
-att upptäcka det.
-
-TODO kolla nullpointer om man redigerar en fågel
+/**
+ * BirdActivity is the activity that displays information
+ * about a bird. The bird's photos are displayed in an
+ * image switcher and the app bar gives options to take
+ * a picture, edit the bird and delete the bird from the
+ * application.
+ *
+ * File:       BirdActivity.java
+ * Author:     Jonas Nyman
+ * Assignment: Inlämningsuppgift 3 - Valfri Applikation
+ * Course:     Utveckling av mobila applikationer
+ * Version:    1.0
  */
 public class BirdActivity extends AppCompatActivity {
     private static final String TAG = "BirdActivity";
@@ -68,11 +64,12 @@ public class BirdActivity extends AppCompatActivity {
     private Button mNextImageButton;
     private Button mPrevImageButton;
     private TextView mImagePhotoView;
-    private int currIndex;
-    private ArrayList<File> photoFiles;
+    private Button deleteButton;
 
+    private int currIndex;
     private Bird bird;
     private ArrayList<BirdPhoto> photos;
+    private ArrayList<File> photoFiles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,13 +124,15 @@ public class BirdActivity extends AppCompatActivity {
                     @Override
                     protected Bitmap doInBackground(ImageView... imageViews) {
                         v = imageViews[0];
-
                         if (photoFiles.size() != 0) {
-                            Bitmap bitmap = BitmapFactory.decodeFile(photoFiles.get(currIndex).getAbsolutePath());
+                            Bitmap bitmap = BitmapFactory.decodeFile(
+                                    photoFiles.get(currIndex).getAbsolutePath());
                             if (bitmap != null) {
-                                int nh = (int) (bitmap.getHeight() * (1100.0 / bitmap.getWidth())); //512.0
-                                Bitmap scaled = Bitmap.createScaledBitmap(bitmap, 1100, nh, true); //512
-                                return scaled;
+                                int imageSize = (int) (bitmap.getHeight()
+                                        * (1100.0 / bitmap.getWidth()));
+                                Bitmap scaledImage = Bitmap.createScaledBitmap(bitmap,
+                                        1100, imageSize, true);
+                                return scaledImage;
                             }
                         }
                         return null;
@@ -158,7 +157,6 @@ public class BirdActivity extends AppCompatActivity {
 
                 return myView;
             }
-
         });
 
         mImagePhotoView = (TextView) findViewById(R.id.image_photo_name);
@@ -186,16 +184,72 @@ public class BirdActivity extends AppCompatActivity {
                 displayNextImage(mSwitcher);
             }
         });
+
+        deleteButton = (Button) findViewById(R.id.delete_picture_button);
+        if (photoFiles.isEmpty()) {
+            deleteButton.setEnabled(false);
+            deleteButton.setVisibility(View.INVISIBLE);
+        }
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(view.getContext());
+                dialogBuilder.setTitle(R.string.delete_dialog_card_title).
+                        setMessage(R.string.delete_dialog_card_msg).
+                        setCancelable(true);
+                dialogBuilder.setPositiveButton(R.string.ok_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        deletePicture();
+                    }
+                });
+                dialogBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //Do nothing, user clicked cancel
+                    }
+                });
+
+                AlertDialog dialog = dialogBuilder.create();
+                dialog.show();
+            }
+        });
+
     }
 
+    /**
+     * Delete a picture by calling BirdBank's deleteBirdPhoto.
+     * UI components are updated and another picture is displayed
+     * in the image switcher.
+     */
+    private void deletePicture() {
+        String tmp = photoFiles.get(currIndex).getName();
+        photoFiles.remove(currIndex);
+        BirdBank.get(this).deleteBirdPhoto(tmp, bird);
 
+        if (photoFiles.isEmpty()) {
+            mSwitcher.setImageDrawable(null);
+            deleteButton.setVisibility(View.INVISIBLE);
+            deleteButton.setEnabled(false);
+            mImagePhotoView.setText(null);
+        } else {
+            displayNextImage(mSwitcher);
+        }
+    }
+
+    /**
+     * Display the next image on the imageswitcher.
+     * The value of currIndex decides if the next or the
+     * previous bird image in the photo list are to be displayed.
+     *
+     * @param v Imageswitcher to display the next image.
+     */
     private void displayNextImage(View v) {
         if (currIndex > photoFiles.size()-1) {
             currIndex = 0;
         } else if (currIndex < 0) {
             currIndex = photoFiles.size()-1;
         }
-        Log.d(TAG, "Currindex: " +currIndex);
         if (photoFiles.size() != 0) {
             mSwitcher.setImageURI(Uri.fromFile(photoFiles.get(currIndex).getAbsoluteFile()));
             mImagePhotoView.setText(photoFiles.get(currIndex).getName());
@@ -204,23 +258,19 @@ public class BirdActivity extends AppCompatActivity {
         mPrevImageButton.setEnabled(true);
     }
 
-
-    private void changeImage(View v) {
-        currIndex++;
-        Bitmap bmImg = BitmapFactory.decodeFile(photoFiles.get(currIndex).getAbsolutePath());
-        mSwitcher.setImageURI(Uri.fromFile(photoFiles.get(currIndex).getAbsoluteFile()));
-    }
-
-    public void showLargerImage(String photoname) {
+    /**
+     * Start the BirdImageActivity that displays a larger image.
+     *
+     * @param photoName Name of photo to be displayed.
+     */
+    public void showLargerImage(String photoName) {
         Intent intent = new Intent(BirdActivity.this, BirdImageActivity.class);
-        intent.putExtra("Name", photoname);
+        intent.putExtra("Name", photoName);
         startActivity(intent);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.bird_edit_menu, menu);
         return true;
     }
@@ -324,6 +374,9 @@ public class BirdActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Delete current bird from the Bird bank and finish the activity.
+     */
     private void applyDeleteBird() {
         BirdBank.get(this).deleteBirdInfo(bird);
         finish();
@@ -342,25 +395,6 @@ public class BirdActivity extends AppCompatActivity {
         latinNameView.setText(bird.getLatinName());
     }
 
-    private void showPhoto() {
-
-
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        showPhoto();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
-
-    //Förutom det finns en bugg när man redigerar fågeln
-    //Annars allt klart och gör layout-land
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d("POPO", "Requestcode:"+requestCode);
@@ -375,29 +409,8 @@ public class BirdActivity extends AppCompatActivity {
                 photoFiles.add(f);
                 currIndex = photoFiles.size()-1;
                 displayNextImage(mSwitcher);
-            }
-            return;
-        } else if (requestCode == REQUEST_PHOTO) {
-                Log.d(TAG, "Efter kollen");
-            // create a new Photo object and attach it to the crime
-            String filename = data
-                    .getStringExtra(BirdCameraFragment.EXTRA_PHOTO_FILENAME);
-            if (filename != null) {
-                Log.d(TAG, "Fick tillbaka: "+filename);
-                BirdPhoto photo = new BirdPhoto(filename);
-                ArrayList<BirdPhoto> photos = new ArrayList<BirdPhoto>();
-                photos.add(photo);
-                bird.setPhotos(photos);
-                BirdBank.get(this).updateBird(bird);
-                //Photo p = new Photo(filename);
-                //mCrime.setPhoto(p);
-                showPhoto();
-                Log.d(TAG, filename);
-                File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).
-                        getAbsolutePath(), photo.getFileName());
-                photoFiles.add(f);
-                displayNextImage(mSwitcher);
-                //BirdBank.get(this).storeBirds();
+                deleteButton.setVisibility(View.VISIBLE);
+                deleteButton.setEnabled(true);
             }
         }
     }

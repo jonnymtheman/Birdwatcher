@@ -16,7 +16,6 @@ public class CreateBirdActivity extends AppCompatActivity {
     private EditText birdNameInput;
     private EditText birdLatinNameInput;
 
-
     private String nameString;
     private String latinNameString;
 
@@ -45,6 +44,7 @@ public class CreateBirdActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "Clicked cancel");
+                finish();
             }
         });
     }

@@ -34,14 +34,8 @@ public class BirdListFragment extends ListFragment {
 
         getActivity().setTitle("Your birds");
 
-        //birds = new ArrayList<Bird>();
         birds = BirdBank.get(getActivity()).getBirds();
 
-        /*
-        for (int i = 0; i < 10; i++) {
-            Bird bird = new Bird("Name"+i, i);
-            birds.add(bird);
-        } */
         BirdAdapter adapter = new BirdAdapter(birds);
         setListAdapter(adapter);
 
