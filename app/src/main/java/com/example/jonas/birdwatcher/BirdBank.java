@@ -8,7 +8,6 @@ import android.widget.Toast;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -239,7 +238,6 @@ public class BirdBank {
         String[] namePhoto = string.split(",");
         if (namePhoto.length == 4) {
             String[] photos = namePhoto[3].split(";");
-            int i = 0;
             for (String photoName : photos) {
                 if (photoName.startsWith("Photo") &&
                         photoName.endsWith(".jpg")) {

@@ -39,10 +39,12 @@ public class BirdImageFragment extends DialogFragment {
                              Bundle savedInstanceState) {
         mImageView = new ImageView(getActivity());
         String path = (String) getArguments().getSerializable("Name");
-        File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).
-                getAbsolutePath(), path);
-        Bitmap bitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
-        mImageView.setImageBitmap(bitmap);
+        if (path != null) {
+            File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).
+                    getAbsolutePath(), path);
+            Bitmap bitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
+            mImageView.setImageBitmap(bitmap);
+        }
         return mImageView;
     }
 }

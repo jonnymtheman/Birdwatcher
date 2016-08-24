@@ -27,12 +27,15 @@
             </intent-filter>
         </activity>
         <activity android:name=".BirdListActivity" />
-        <activity android:name=".BirdActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".BirdActivity"
+            android:screenOrientation="portrait" />
         <activity android:name=".CreateBirdActivity" />
-        <activity android:name=".BirdImageActivity"
+        <activity
+            android:name=".BirdImageActivity"
+            android:screenOrientation="landscape" />
+        <activity android:name=".BirdCameraActivity"
             android:screenOrientation="landscape">
-
         </activity>
     </application>
 

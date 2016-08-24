@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:id="@+id/bird_list_bird"
     android:text="@string/ExempelBirdName"
-    android:textSize="40dp" />
+    android:textSize="40sp" />
 
 
 </LinearLayout>

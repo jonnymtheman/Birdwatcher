@@ -1,5 +1,7 @@
 package com.example.jonas.birdwatcher;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Environment;
@@ -8,10 +10,9 @@ import android.widget.ImageView;
 import java.io.File;
 
 /**
- * TODO kolla det gråa utanför bilden
  * Displays a larger Image in an imageView.
- * In order to scale the picture, the class PictureUtils
- * have been used.
+ * The image is scaled up to a larger size before
+ * being displayed.
  *
  * File:       BirdImageActivity.java
  * Author:     Jonas Nyman
@@ -33,10 +34,14 @@ public class BirdImageActivity extends AppCompatActivity{
         imageView = (ImageView) findViewById(R.id.bird_large_imageView);
         File f = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES).getAbsolutePath(), fileName);
-        BitmapDrawable drawable = PictureUtils.getScaledDrawable(this,
-                f.getPath());
-        if (drawable != null) {
-            imageView.setImageDrawable(drawable);
+        Bitmap bitmap = BitmapFactory.decodeFile(
+                f.getAbsolutePath());
+        int imageSize = (int) (bitmap.getHeight()
+                * (2200.0 / bitmap.getWidth()));
+        Bitmap scaledImage = Bitmap.createScaledBitmap(bitmap,
+                2200, imageSize, true);
+        if (scaledImage != null) {
+            imageView.setImageBitmap(scaledImage);
         }
     }
 }

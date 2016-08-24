@@ -300,7 +300,8 @@ public class BirdActivity extends AppCompatActivity {
                     new AsyncTask<Integer, Void, String>() {
                         @Override
                         protected String doInBackground(Integer... integers) {
-                            Intent intent = new Intent(BirdActivity.this, CameraActivity.class);
+                            //Intent intent = new Intent(BirdActivity.this, CameraActivity.class);
+                            Intent intent = new Intent(BirdActivity.this, BirdCameraActivity.class);
                             intent.putExtra(BIRD_NAME, bird.getName());
                             intent.putExtra(BIRD_ID, bird.getmId());
                             intent.putExtra(PHOTO_ID, bird.getPhotos().size());
@@ -419,7 +420,7 @@ public class BirdActivity extends AppCompatActivity {
 
     /**
      * Retrieve the photo taken by the camera activity.
-     *
+     * TODO kolla om size blir bättre när man ska se hela bilden
      * @param requestCode Request code.
      * @param resultCode Result code.
      * @param data Intent containing the filename with key "Filename".
@@ -427,18 +428,20 @@ public class BirdActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != Activity.RESULT_OK) {
-            String filename = data
-                    .getStringExtra("Filename");
-            if (filename != null) {
-                bird = BirdBank.get(this).getBird(bird.getmId());
-                File f = new File(Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_PICTURES).
-                        getAbsolutePath(), filename);
-                photoFiles.add(f);
-                currIndex = photoFiles.size()-1;
-                displayNextImage(mSwitcher);
-                deleteButton.setVisibility(View.VISIBLE);
-                deleteButton.setEnabled(true);
+            if (data != null) {
+                String filename = data
+                        .getStringExtra("Filename");
+                if (filename != null) {
+                    bird = BirdBank.get(this).getBird(bird.getmId());
+                    File f = new File(Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_PICTURES).
+                            getAbsolutePath(), filename);
+                    photoFiles.add(f);
+                    currIndex = photoFiles.size() - 1;
+                    displayNextImage(mSwitcher);
+                    deleteButton.setVisibility(View.VISIBLE);
+                    deleteButton.setEnabled(true);
+                }
             }
         }
     }
