@@ -13,7 +13,6 @@ import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -323,8 +322,6 @@ public class BirdActivity extends AppCompatActivity {
                 applyButt.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Log.d(TAG, editBirdName.getText().toString()+","+
-                        editLatinName.getText().toString());
                         applyChanges(editBirdName.getText().toString(),
                                 editLatinName.getText().toString());
                         toggleEditFieldsVisibility();

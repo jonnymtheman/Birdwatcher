@@ -2,9 +2,7 @@ package com.example.jonas.birdwatcher;
 
 import android.content.Context;
 import android.os.Environment;
-import android.util.Log;
 import android.widget.Toast;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -262,7 +260,6 @@ public class BirdBank {
             os = this.appContext.openFileOutput(filename, Context.MODE_PRIVATE);
             os.write(bird.toString().getBytes());
         } catch (Exception e) {
-            Log.e(TAG, "Error writing to file " + filename, e);
             displayToast();
         } finally {
             try {

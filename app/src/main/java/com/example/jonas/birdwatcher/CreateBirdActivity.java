@@ -2,7 +2,6 @@ package com.example.jonas.birdwatcher;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,7 +31,6 @@ public class CreateBirdActivity extends AppCompatActivity {
         mCreateBirdButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "Name: "+birdNameInput.getText() + ", Latin: " +birdLatinNameInput.getText());
                 nameString = birdNameInput.getText().toString();
                 saveBird(birdLatinNameInput.getText().toString(), birdLatinNameInput.getText().toString());
 
@@ -43,15 +41,12 @@ public class CreateBirdActivity extends AppCompatActivity {
         mCancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "Clicked cancel");
                 finish();
             }
         });
     }
 
     private void saveBird(String name, String latinName) {
-        Log.d(TAG, "Real name: "+name);
-        Log.d(TAG, "Real Latin name: "+latinName);
         int id = BirdBank.get(this).getBirds().size();
         Bird bird = new Bird(nameString,latinName, id);
         BirdBank.get(this).storeBirdInfo(bird);
