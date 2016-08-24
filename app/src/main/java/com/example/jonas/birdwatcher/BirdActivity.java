@@ -107,6 +107,7 @@ public class BirdActivity extends AppCompatActivity {
 
         currIndex = 0;
 
+        //ImageSwitcher to display images of birds
         mSwitcher = (ImageSwitcher) findViewById(R.id.imageSwitcher);
         mSwitcher.setFactory(new ImageSwitcher.ViewFactory() {
             @Override
@@ -120,7 +121,7 @@ public class BirdActivity extends AppCompatActivity {
                 myView.setScaleType(ImageView.ScaleType.CENTER);
                 new AsyncTask<ImageView, Void, Bitmap>() {
                     ImageView v;
-
+                    //Scale images for improved performance
                     @Override
                     protected Bitmap doInBackground(ImageView... imageViews) {
                         v = imageViews[0];
@@ -137,7 +138,7 @@ public class BirdActivity extends AppCompatActivity {
                         }
                         return null;
                     }
-
+                    //Set scaled image to the ImageSwitcher
                     @Override
                     protected void onPostExecute(Bitmap bm) {
                         if (bm != null) {
@@ -146,6 +147,7 @@ public class BirdActivity extends AppCompatActivity {
                     }
 
                 }.execute(myView);
+                //Start new activity if user presses on the image
                 myView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -191,6 +193,7 @@ public class BirdActivity extends AppCompatActivity {
             deleteButton.setVisibility(View.INVISIBLE);
         }
         deleteButton.setOnClickListener(new View.OnClickListener() {
+            //Display dialog to confirm deletion of picture
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(view.getContext());
@@ -214,7 +217,6 @@ public class BirdActivity extends AppCompatActivity {
                 dialog.show();
             }
         });
-
     }
 
     /**
@@ -269,21 +271,33 @@ public class BirdActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /**
+     * Inflate the app bar menu bird_edit_menu.
+     *
+     * @param menu Menu to be inflated.
+     * @return True.
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.bird_edit_menu, menu);
         return true;
     }
 
+    /**
+     * Decide action depending on which app bar icon the user taps.
+     * The camera is started within a AsyncTask to improve performance.
+     *
+     * @param item Menu item pressed.
+     * @return True or Menu item.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_take_pic :
-                Log.d(TAG, "Tryckte på take pic");
                 PackageManager pm = getPackageManager();
                 if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
+                    //Start camera activity in AsyncTask
                     new AsyncTask<Integer, Void, String>() {
-
                         @Override
                         protected String doInBackground(Integer... integers) {
                             Intent intent = new Intent(BirdActivity.this, CameraActivity.class);
@@ -314,14 +328,13 @@ public class BirdActivity extends AppCompatActivity {
                 cancelButt.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Log.d(TAG, "Klickade cancel");
                         toggleEditFieldsVisibility();
                     }
                 });
                 return true;
 
             case R.id.menu_item_delete_bird :
-                displayDialog();
+                displayDeleteBirdDialog();
                 return true;
 
             default:
@@ -329,6 +342,10 @@ public class BirdActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Toggles the Edit text fields visibility to allow
+     * the user to edit the Bird.
+     */
     private void toggleEditFieldsVisibility() {
         if (nameView.getVisibility() == View.VISIBLE) {
             nameView.setVisibility(View.GONE);
@@ -336,7 +353,7 @@ public class BirdActivity extends AppCompatActivity {
             editNameLayout.setVisibility(View.VISIBLE);
             editLatinNameLayout.setVisibility(View.VISIBLE);
             buttonLayout.setVisibility(View.VISIBLE);
-        } else  {
+        } else {
             nameView.setVisibility(View.VISIBLE);
             latinNameView.setVisibility(View.VISIBLE);
             editNameLayout.setVisibility(View.GONE);
@@ -345,7 +362,11 @@ public class BirdActivity extends AppCompatActivity {
         }
     }
 
-    private void displayDialog() {
+    /**
+     * Display a dialog confirming that the user indeed wishes to
+     * delete the bird permanently.
+     */
+    private void displayDeleteBirdDialog() {
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         dialogBuilder.setTitle(R.string.delete_dialog_title);
@@ -358,20 +379,17 @@ public class BirdActivity extends AppCompatActivity {
         dialogBuilder.setPositiveButton(R.string.ok_button, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                Log.d(TAG, "Clicked ok in dialog");
                 applyDeleteBird();
             }
         });
         dialogBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                Log.d(TAG, "Clicked cancel in dialog");
+                //Do nothing, user pressed cancel
             }
         });
-
         AlertDialog deleteDialog = dialogBuilder.create();
         deleteDialog.show();
-
     }
 
     /**
@@ -382,29 +400,39 @@ public class BirdActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * Apply the changes after the Bird has been modified.
+     *
+     * @param name New bird's name.
+     * @param latinName New latin bird's name.
+     */
     private void applyChanges(String name, String latinName) {
         Bird newBird = new Bird(name, latinName, bird.getmId());
         newBird.setPhotos(bird.getPhotos());
         BirdBank.get(this).deleteBirdInfo(bird);
-        ArrayList<Bird> bird1 = BirdBank.get(this).getBirds();
         BirdBank.get(this).storeBirdInfo(newBird);
-        ArrayList<Bird> bird2 = BirdBank.get(this).getBirds();
         bird = newBird;
 
         nameView.setText(bird.getName());
         latinNameView.setText(bird.getLatinName());
     }
 
+    /**
+     * Retrieve the photo taken by the camera activity.
+     *
+     * @param requestCode Request code.
+     * @param resultCode Result code.
+     * @param data Intent containing the filename with key "Filename".
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d("POPO", "Requestcode:"+requestCode);
         if (resultCode != Activity.RESULT_OK) {
-            Log.d(TAG, "Här inne");
             String filename = data
                     .getStringExtra("Filename");
             if (filename != null) {
                 bird = BirdBank.get(this).getBird(bird.getmId());
-                File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).
+                File f = new File(Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_PICTURES).
                         getAbsolutePath(), filename);
                 photoFiles.add(f);
                 currIndex = photoFiles.size()-1;

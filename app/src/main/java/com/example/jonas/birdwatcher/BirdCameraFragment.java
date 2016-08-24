@@ -1,13 +1,9 @@
 package com.example.jonas.birdwatcher;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
@@ -23,9 +19,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+/**
+ * Example class from the book
+ * Android Programming, The Big Nerd Ranch Guide - Brian Hardy, Bill Philips.
+ *
+ * This class has been slightly modified to store the taken picture
+ * and return an intent back to BirdActivity.
+ *
+ * File:       .java
+ * Author:     Brian Hardy, Bill Phillips
+ * Assignment: Inlämningsuppgift 3 - Valfri Applikation
+ * Course:     Utveckling av mobila applikationer
+ * Version:    1.0
+ */
 public class BirdCameraFragment extends Fragment {
     private static final String TAG = "BirdCameraFragment";
-    public static final String EXTRA_PHOTO_FILENAME = "BirdCameraFragment.filename";
 
     private String birdName;
     private int birdID;
@@ -33,8 +41,6 @@ public class BirdCameraFragment extends Fragment {
     private Camera mCamera;
     private SurfaceView mSurfaceView;
     private View mProgressContainer;
-
-
 
     private Camera.ShutterCallback mShutterCallback = new Camera.ShutterCallback() {
         public void onShutter() {
@@ -44,11 +50,12 @@ public class BirdCameraFragment extends Fragment {
     };
     private Camera.PictureCallback mJpegCallBack = new Camera.PictureCallback() {
         public void onPictureTaken(byte[] data, Camera camera) {
-            // create a filename
-            String filename = birdID + birdPhotoID +".jpg"; //UUID.randomUUID().toString() + ".jpg";
+            String filename = birdID + birdPhotoID +".jpg";
             Log.d(TAG, "FileName: "+filename);
             String tmp = "";
+            //Store the image in the BirdBank.
             tmp = BirdBank.get(getActivity()).storeBirdPhoto(data, birdID);
+
             Intent intent = new Intent();
             intent.putExtra("Filename", tmp);
             getActivity().setResult(1, intent);
@@ -64,9 +71,6 @@ public class BirdCameraFragment extends Fragment {
         birdName = getActivity().getIntent().getStringExtra("BIRD_NAME");
         birdID = getActivity().getIntent().getIntExtra("BIRD_ID",0);
         birdPhotoID = getActivity().getIntent().getIntExtra("PHOTO_ID", 0);
-        Log.d(TAG, "Birdname: "+birdName);
-        Log.d(TAG, "BirdID: "+birdID);
-
 
         mProgressContainer = v.findViewById(R.id.bird_camera_progressContainer);
         mProgressContainer.setVisibility(View.INVISIBLE);

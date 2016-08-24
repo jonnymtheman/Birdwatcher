@@ -15,7 +15,6 @@ public class BirdPhoto  {
     private String fileName;
 
     public BirdPhoto(String fileName) {
-
         this.fileName = fileName;
     }
 
@@ -26,6 +25,5 @@ public class BirdPhoto  {
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
-
 
 }

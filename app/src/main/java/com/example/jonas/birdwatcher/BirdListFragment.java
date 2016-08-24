@@ -10,15 +10,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import java.util.ArrayList;
 
 /**
+ * Fragment that displays a list of all the Birds.
+ * The user can tap the app bar to create a new Bird.
  *
- * File:       ${FILE_NAME}.java
+ * File:       BirdListFragment.java
  * Author:     Jonas Nyman
  * Assignment: Inlämningsuppgift 3 - Valfri Applikation
  * Course:     Utveckling av mobila applikationer
@@ -40,19 +40,29 @@ public class BirdListFragment extends ListFragment {
         setListAdapter(adapter);
 
         setHasOptionsMenu(true);
-
     }
 
+    /**
+     * Inflate the app bar menu.
+     * @param menu
+     * @param inflater
+     */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_bird_list, menu);
     }
 
+    /**
+     * Start CreateBirdActivity to create a new Bird if the user
+     * taps the new bird icon in the app bar menu.
+     *
+     * @param item Menu item.
+     * @return True or menu item.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_new_bird :
-                Log.d("LisftFragment", "Tryckte på new bird");
                 Intent intent = new Intent(getActivity(), CreateBirdActivity.class);
                 startActivity(intent);
                 return true;
@@ -61,6 +71,15 @@ public class BirdListFragment extends ListFragment {
         }
     }
 
+    /**
+     * Starts BirdActivity to display more information about a Bird
+     * when the user taps on a item in the list.
+     *
+     * @param l ListView.
+     * @param v View.
+     * @param position Position.
+     * @param id Id.
+     */
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
 
@@ -70,7 +89,10 @@ public class BirdListFragment extends ListFragment {
         startActivity(i);
     }
 
-
+    /**
+     * Update the birds when returning to the fragment if any
+     * changes to the Birds has been made.
+     */
     @Override
     public void onResume() {
         super.onResume();
@@ -78,33 +100,29 @@ public class BirdListFragment extends ListFragment {
         ((BirdAdapter)getListAdapter()).notifyDataSetChanged();
     }
 
-
+    /**
+     * ArrayAdapter for the list, sets the list item to a
+     * TextView holding the Bird's name;
+     */
     private class BirdAdapter extends ArrayAdapter<Bird> {
 
         public BirdAdapter(ArrayList<Bird> birds) {
             super(getActivity(), 0, birds);
         }
 
-
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            // If we weren't given a view, inflate one
             if (convertView == null) {
-                convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item_bird, null);
+                convertView = getActivity().getLayoutInflater().inflate(
+                        R.layout.list_item_bird, null);
             }
-            // Configure the view for this Crime
             Bird bird = getItem(position);
-            if (bird == null) {
-                Log.d("TAG", "Bird var null");
-            } else {
-                //Log.d("TAG", ""+bird.getName());
-            }
-
 
             TextView titleTextView =
                     (TextView) convertView.findViewById(R.id.bird_list_bird);
-            titleTextView.setText(bird.getName());
-
+            if(bird != null) {
+                titleTextView.setText(bird.getName());
+            }
 
             return convertView;
         }

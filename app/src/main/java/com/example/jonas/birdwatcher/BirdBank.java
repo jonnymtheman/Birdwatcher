@@ -111,11 +111,8 @@ public class BirdBank {
                 }
             bird.addPhoto(new BirdPhoto(newFileName));
             storeBirdInfo(bird);
-            Log.d(TAG, "Sparade: "+newFileName);
-
             return retStr +=newFileName;
         }
-
         return  retStr;
     }
 
@@ -149,10 +146,7 @@ public class BirdBank {
             deleted = file.delete();
         }
 
-        if (deleted) {
-            Log.d(TAG, "Deleted: "+photoName);
-        } else {
-            Log.d(TAG, "Not deleted: "+photoName);
+        if (!deleted) {
             displayToast();
         }
     }
@@ -247,7 +241,8 @@ public class BirdBank {
             String[] photos = namePhoto[3].split(";");
             int i = 0;
             for (String photoName : photos) {
-                if (photoName.startsWith("Photo") && photoName.endsWith(".jpg")) {
+                if (photoName.startsWith("Photo") &&
+                        photoName.endsWith(".jpg")) {
                     photoNames.add(photoName);
                 }
             }
@@ -277,7 +272,6 @@ public class BirdBank {
                 if (os != null)
                     os.close();
             } catch (Exception e) {
-                Log.e(TAG, "Error closing file " + filename, e);
                 displayToast();
             }
         }

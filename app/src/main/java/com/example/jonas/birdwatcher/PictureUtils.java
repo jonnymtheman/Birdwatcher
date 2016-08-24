@@ -11,7 +11,7 @@ import android.widget.ImageView;
  * Example class from the book
  * Android Programming, The Big Nerd Ranch Guide - Brian Hardy, Bill Philips.
  *
- * This class enables
+ * This class enables picture scaling to be used in BirdImageActivity.
  *
  * File:       PictureUtils.java
  * Author:     Brian Hardy, Bill Phillips
